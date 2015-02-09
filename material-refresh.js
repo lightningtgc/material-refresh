@@ -1,15 +1,17 @@
-(function($){
+;(function($){
+
+    //Known issue: iOS feature when scrolling ,animation will stop
+
     // DOM
     var $scrollEl = $(document.body);
     var $doc = $(document);
-    var $refreshMain = $('#refreshMain');
-    var $spinnerWrapper = $('.md-spinner-wrapper');
-    var $arrowWrapper = $('.ui-reload-face');
-    var $arrowMain = $('.ui-half-circle', $arrowWrapper);
+
+    var $refreshMain, $spinnerWrapper, $arrowWrapper, $arrowMain;
 
     var noShowClass = 'ui-noshow-refresh';
 
     var isShowLoading = false;
+    var isDoingStop = false;
 
     var NUM_POS_START_Y = -70;
     var NUM_POS_TARGET_Y = 0;
@@ -19,19 +21,86 @@
     var touchCurrentY;
     var touchStartY = 0;
     var verticalThreshold = 2;
+    var maxRotateTime = 3000;
+
+    var onBegin = null;
+    var onEnd = null;
+    var stopAnimatTimeout = null;
+
+    //TODO: theme extract
+    var renderTmpl = '<div id="muiRefreshMain" class="ui-refresh-main md-blue-theme">\
+        <div class="ui-refresh-wrapper ">\
+            <div class="ui-reload-face">\
+                <div class="ui-half-circle"></div>\
+            </div>\
+            <div class="md-spinner-wrapper" style="display:none;">\
+                <div class="md-inner" >\
+                    <div class="md-gap"></div>\
+                    <div class="md-left">\
+                        <div class="md-half-circle"></div>\
+                    </div>\
+                    <div class="md-right">\
+                        <div class="md-half-circle"></div>\
+                    </div>\
+                </div>\
+            </div>\
+        </div>\
+    </div>';
 
     var touchPos = {
         x1: 0,
         x2: 0
     };
 
-    //TODO: iOS feature when scrolling ,animation will stop
+    var utils = {
+        isIos: function(){
+            return $.os.ios;
+        }
+    };
 
-    function init(options) {
-        scrollEl = utils.isIos() ? 
-                        options.scrollEl ? $(options.scrollEl) : $scrollEl
-                   : $doc;
 
+    /* var opts = { */
+    /*     scrollEl: null, */
+    /*     maxRotateTime: 3000, */
+    /*     onRotateBegin: null, */
+    /*     onRotateEnd: null */
+
+        
+    /* }; */
+
+
+    function mRefresh(options) {
+        options = options || {};
+
+        $scrollEl = options.scrollEl ? $(options.scrollEl) :
+                        utils.isIos() ? $scrollEl : $doc;
+        onBegin = options.onRotateBegin;
+        onEnd = options.onRotateEnd;
+        maxRotateTime = options.maxRotateTime || maxRotateTime;
+
+        if(!document.getElementById('muiRefreshMain')){
+            renderRefresh();
+
+            $refreshMain = $('#muiRefreshMain');
+            $spinnerWrapper = $('.md-spinner-wrapper');
+            $arrowWrapper = $('.ui-reload-face');
+            $arrowMain = $('.ui-half-circle', $arrowWrapper);
+        }
+
+    }
+
+    // Finish loading
+    mRefresh.resolve = function() {
+        if(!isDoingStop && stopAnimatTimeout){
+            clearTimeout(stopAnimatTimeout);
+            stopAnimatTimeout = null;
+
+            recoverRefresh();
+        }
+    }
+    
+    function renderRefresh(){
+        $(document.body)[0].insertAdjacentHTML('beforeend', renderTmpl);
     }
 
     function touchStart(e){
@@ -73,12 +142,12 @@
 
             if(touchCurrentY < NUM_POS_MAX_Y){
                 touchCurrentY += distanceY ;
-                $refreshMain.css('-webkit-transform', 'translateY(' + touchCurrentY + 'px)');
-                $refreshMain.css('transform', 'translateY(' + touchCurrentY + 'px)');
+                $refreshMain.css('-webkit-transform', 'translateY(' + touchCurrentY  + 'px)');
+                /* $refreshMain.css('transform', 'translateY(' + touchCurrentY + 'px)'); */
                 $arrowMain.css('-webkit-transform', 'rotate(' + -(touchCurrentY * 3) + 'deg)');
-                $arrowMain.css('transform', 'rotate(' + -(touchCurrentY * 3) + 'deg)');
+                /* $arrowMain.css('transform', 'rotate(' + -(touchCurrentY * 3) + 'deg)'); */
             } else {
-                doLoader();
+                doRotate();
                 return;
             }
 
@@ -96,7 +165,7 @@
         e.stopPropagation();
         
         if(touchCurrentY > NUM_POS_MIN_Y){
-            doLoader();
+            doRotate();
         } else {
             // Distance must greater than NUM_POS_MIN_Y
             $refreshMain.css('-webkit-transform', 'translateY(' + NUM_POS_START_Y + 'px)');
@@ -104,36 +173,51 @@
         }
     }
 
-    function doLoader(){
+    function doRotate(){
         isShowLoading = true;
+
+        // Do onBegin callback
+        if (typeof onBegin === 'function') {
+            onBegin();
+        }
 
         $refreshMain.css('-webkit-transform', 'translateY(' + NUM_POS_TARGET_Y + 'px)');
         $refreshMain.css('transform', 'translateY(' + NUM_POS_TARGET_Y + 'px)');
-
         $arrowWrapper.hide();
+
         // Start animation
         $spinnerWrapper.show();
 
-        setTimeout(function(){
-
-            // Stop animation 
-            $refreshMain.addClass(noShowClass);
-            $spinnerWrapper.hide();
-
-            setTimeout(recoverRefresh, 500);
-
-        }, 3000);
+        // Timeout to stop animation
+        stopAnimatTimeout = setTimeout(recoverRefresh, maxRotateTime);
     }
 
     function recoverRefresh(){
-        //TODO: display gently.
-        $refreshMain.removeClass(noShowClass);
-        $refreshMain.hide();
-        $refreshMain.css('-webkit-transform', 'translateY(' + NUM_POS_START_Y + 'px)');
-        $refreshMain.css('transform', 'translateY(' + NUM_POS_START_Y + 'px)');
-        
-        $arrowWrapper.show();
-        isShowLoading = false;  
+
+        // For aviod resolve
+        isDoingStop = true;
+
+        // Stop animation 
+        $refreshMain.addClass(noShowClass);
+        $spinnerWrapper.hide();
+
+        setTimeout(function(){
+            //TODO: display gently.
+            $refreshMain.removeClass(noShowClass);
+            $refreshMain.hide();
+            $refreshMain.css('-webkit-transform', 'translateY(' + NUM_POS_START_Y + 'px)');
+            $refreshMain.css('transform', 'translateY(' + NUM_POS_START_Y + 'px)');
+
+            $arrowWrapper.show();
+
+            isShowLoading = false;
+            isDoingStop = false;
+
+            if (typeof onEnd === 'function') {
+                onEnd();
+            }
+
+        }, 500); 
     }
 
     function bindEvents(){
@@ -150,4 +234,7 @@
 
     bindEvents();
 
-})(Zepto);
+    window.mRefresh = mRefresh;
+
+})(Zepto || jQuery);
+

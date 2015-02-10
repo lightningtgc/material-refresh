@@ -1,17 +1,28 @@
+/**
+ * 4 types of refresh
+ *
+ * @return {undefined}
+ */
+
+
 ;(function($){
 
-    //Known issue: iOS feature when scrolling ,animation will stop
+    /* Known issue: 
+     * 1.iOS feature when scrolling ,animation will stop  
+     * 2.
+     */
 
     // DOM
     var $scrollEl = $(document.body);
-    var $doc = $(document);
 
     var $refreshMain, $spinnerWrapper, $arrowWrapper, $arrowMain;
 
-    var noShowClass = 'ui-noshow-refresh';
+    var scrollEl = document.body;
+
+    var noShowClass = 'mui-refresh-noshow';
 
     var isShowLoading = false;
-    var isDoingStop = false;
+    var isStoping = false;
 
     var NUM_POS_START_Y = -70;
     var NUM_POS_TARGET_Y = 0;
@@ -26,21 +37,23 @@
     var onBegin = null;
     var onEnd = null;
     var stopAnimatTimeout = null;
+    var lastTime = new Date().getTime();
+
+    var isIOS = $.os.ios;
 
     //TODO: theme extract
-    var renderTmpl = '<div id="muiRefreshMain" class="ui-refresh-main md-blue-theme">\
-        <div class="ui-refresh-wrapper ">\
-            <div class="ui-reload-face">\
-                <div class="ui-half-circle"></div>\
+    var tmpl = '<div id="muiRefresh" class="mui-refresh-main mui-blue-theme">\
+        <div class="mui-refresh-wrapper ">\
+            <div class="mui-arrow-wrapper">\
+                <div class="mui-arrow-main"></div>\
             </div>\
-            <div class="md-spinner-wrapper" style="display:none;">\
-                <div class="md-inner" >\
-                    <div class="md-gap"></div>\
-                    <div class="md-left">\
-                        <div class="md-half-circle"></div>\
+            <div class="mui-spinner-wrapper" style="display:none;">\
+                <div class="mui-spinner-main" >\
+                    <div class="mui-spinner-left">\
+                        <div class="mui-half-circle"></div>\
                     </div>\
-                    <div class="md-right">\
-                        <div class="md-half-circle"></div>\
+                    <div class="mui-spinner-right">\
+                        <div class="mui-half-circle"></div>\
                     </div>\
                 </div>\
             </div>\
@@ -48,15 +61,11 @@
     </div>';
 
     var touchPos = {
+        top: 0,
         x1: 0,
         x2: 0
-    };
+    }
 
-    var utils = {
-        isIos: function(){
-            return $.os.ios;
-        }
-    };
 
 
     /* var opts = { */
@@ -66,50 +75,64 @@
     /*     onRotateEnd: null */
 
         
-    /* }; */
+    /* } */
 
 
     function mRefresh(options) {
         options = options || {};
 
-        $scrollEl = options.scrollEl ? $(options.scrollEl) :
-                        utils.isIos() ? $scrollEl : $doc;
+        scrollEl = options.scrollEl ? options.scrollEl :
+                        isIOS ? scrollEl : document;
+        $scrollEl = $(scrollEl);
+
         onBegin = options.onRotateBegin;
         onEnd = options.onRotateEnd;
         maxRotateTime = options.maxRotateTime || maxRotateTime;
 
-        if(!document.getElementById('muiRefreshMain')){
-            renderRefresh();
+        if($('#muiRefresh').length === 0){
+            renderTmpl();
 
-            $refreshMain = $('#muiRefreshMain');
-            $spinnerWrapper = $('.md-spinner-wrapper');
-            $arrowWrapper = $('.ui-reload-face');
-            $arrowMain = $('.ui-half-circle', $arrowWrapper);
+            $refreshMain = $('#muiRefresh');
+            $spinnerWrapper = $('.mui-spinner-wrapper', $refreshMain);
+            $arrowWrapper = $('.mui-arrow-wrapper', $refreshMain);
+            $arrowMain = $('.mui-arrow-main', $refreshMain);
+
         }
+
+        bindEvents();
 
     }
 
     // Finish loading
     mRefresh.resolve = function() {
-        if(!isDoingStop && stopAnimatTimeout){
+        if(!isStoping && stopAnimatTimeout){
             clearTimeout(stopAnimatTimeout);
             stopAnimatTimeout = null;
 
             recoverRefresh();
         }
     }
+
+    mRefresh.destroy = function(){
+        unbindEvents();
+
+    }
     
-    function renderRefresh(){
-        $(document.body)[0].insertAdjacentHTML('beforeend', renderTmpl);
+    function renderTmpl(){
+        $(document.body)[0].insertAdjacentHTML('beforeend', tmpl);
     }
 
+
     function touchStart(e){
-        if(window.scrollY !== 0 || isShowLoading){
-            return;
+        if(isIOS && scrollEl == document.body){
+            touchPos.top = window.scrollY;
+        }else{
+            touchPos.top = document.body.scrollTop;//初始scrollTo
         }
 
-        e.preventDefault();
-        e.stopPropagation();
+        if(touchPos.top > 0 || isShowLoading){
+            return;
+        }
 
         touchCurrentY = NUM_POS_START_Y;
         $refreshMain.show();
@@ -121,14 +144,14 @@
     }
 
     function touchMove(e){
-        var thisTouch, distanceY;  
-        if(window.scrollY !== 0 || isShowLoading || !e.touches || e.touches.length !== 1){
+        var thisTouch, distanceY;
+        var now = new Date().getTime();
+
+        if(touchPos.top > 0 || isShowLoading || !e.touches || e.touches.length !== 1){
             // Just allow one finger
             return;
         }
 
-        e.preventDefault();
-        e.stopPropagation();
 
         thisTouch = e.touches[0];
 
@@ -138,7 +161,16 @@
         // Distance for pageY change
         distanceY = touchPos.y2 - touchPos.y1;
 
-        if (touchPos.y2 > touchStartY + verticalThreshold) {
+        if ( touchPos.y2 > touchStartY + verticalThreshold) {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Some android phone
+            // Throttle ,aviod jitter 
+            if(!isIOS && now - lastTime < 80) {
+                return;
+            }
 
             if(touchCurrentY < NUM_POS_MAX_Y){
                 touchCurrentY += distanceY ;
@@ -153,12 +185,13 @@
 
         }
 
-        // y1 always is the current pageY
+        // y1 is always the current pageY
         touchPos.y1 = thisTouch.pageY;
+        lastTime = now;
     }
 
     function touchEnd(e){
-        if(window.scrollY !== 0 || isShowLoading){
+        if(touchPos.top > 0 || isShowLoading){
             return false;
         }
         e.preventDefault();
@@ -195,15 +228,17 @@
     function recoverRefresh(){
 
         // For aviod resolve
-        isDoingStop = true;
+        isStoping = true;
 
         // Stop animation 
         $refreshMain.addClass(noShowClass);
+
         $spinnerWrapper.hide();
 
         setTimeout(function(){
             //TODO: display gently.
             $refreshMain.removeClass(noShowClass);
+            
             $refreshMain.hide();
             $refreshMain.css('-webkit-transform', 'translateY(' + NUM_POS_START_Y + 'px)');
             $refreshMain.css('transform', 'translateY(' + NUM_POS_START_Y + 'px)');
@@ -211,7 +246,7 @@
             $arrowWrapper.show();
 
             isShowLoading = false;
-            isDoingStop = false;
+            isStoping = false;
 
             if (typeof onEnd === 'function') {
                 onEnd();
@@ -232,7 +267,6 @@
         $scrollEl.off('touchend', touchEnd);
     }
 
-    bindEvents();
 
     window.mRefresh = mRefresh;
 

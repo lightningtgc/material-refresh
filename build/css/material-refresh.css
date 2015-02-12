@@ -17,9 +17,10 @@
 }
 .mui-refresh-main {
   position: fixed;
-  -webkit-perspective: 1000;
+/* -webkit-transform: translateZ(0) */
   -webkit-backface-visibility: hidden;
 }
+-webkit-perspective: 1000,
 .mui-refresh-noshow {
   opacity: 0;
   -webkit-transform: scale(0.01) !important;
@@ -440,4 +441,3 @@
     transform: rotate(1080deg);
   }
 }
-

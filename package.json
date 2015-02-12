@@ -1,0 +1,19 @@
+﻿{
+  "name": "material-refresh",
+  "description": "Material design pull to refresh, mobile only",
+  "version": "0.1.0",
+  "homepage": "https://github.com/lightningtgc/material-refresh",
+  "author": "tang guichuan <tangguichuan@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lightningtgc/material-refresh.git"
+  },  
+  "devDependencies": {
+    "gulp": "^3.8.10",
+    "del": "^1.1.1",
+    "gulp-uglify": "^1.1.0",
+    "gulp-rename": "^1.2.0",
+    "gulp-es6-module-transpiler": "^0.2.1",
+    "gulp-stylus": "^2.0.0"
+  }
+}

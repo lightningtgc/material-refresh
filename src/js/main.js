@@ -9,14 +9,7 @@
 
     /* Known issue: 
      * 1.iOS feature when scrolling ,animation will stop  
-     * 2. Animation display issue in anfroid like miui小米
-     */
-
-    /**
-     * TODO list:
-     * * custom position
-     * * theme extract
-     *
+     * 2.
      */
 
     // DOM
@@ -35,7 +28,6 @@
     var NUM_POS_TARGET_Y = 0;
     var NUM_POS_MAX_Y = 65;
     var NUM_POS_MIN_Y = -25;
-    var basePosY = 0;
 
     var touchCurrentY;
     var touchStartY = 0;
@@ -47,10 +39,9 @@
     var stopAnimatTimeout = null;
     var lastTime = new Date().getTime();
 
-    var refreshType = 2;
-
     var isIOS = $.os.ios;
 
+    //TODO: theme extract
     var tmpl = '<div id="muiRefresh" class="mui-refresh-main mui-blue-theme">\
         <div class="mui-refresh-wrapper ">\
             <div class="mui-arrow-wrapper">\
@@ -94,11 +85,9 @@
                         isIOS ? scrollEl : document;
         $scrollEl = $(scrollEl);
 
-        // extend options
         onBegin = options.onRotateBegin;
         onEnd = options.onRotateEnd;
         maxRotateTime = options.maxRotateTime || maxRotateTime;
-        refreshType = options.type || refreshType;
 
         if($('#muiRefresh').length === 0){
             renderTmpl();
@@ -108,12 +97,6 @@
             $arrowWrapper = $('.mui-arrow-wrapper', $refreshMain);
             $arrowMain = $('.mui-arrow-main', $refreshMain);
 
-        }
-
-        // Different types config
-        if (refreshType == 2) {
-            $refreshMain.addClass('mui-refresh-type' + refreshType);
-            basePosY = 60;
         }
 
         bindEvents();
@@ -132,17 +115,15 @@
 
     mRefresh.destroy = function(){
         unbindEvents();
-        $('#muiRefresh').remove();
 
     }
     
     function renderTmpl(){
-        document.body.insertAdjacentHTML('beforeend', tmpl);
+        $(document.body)[0].insertAdjacentHTML('beforeend', tmpl);
     }
 
 
     function touchStart(e){
-            e.preventDefault();
         if(isIOS && scrollEl == document.body){
             touchPos.top = window.scrollY;
         }else{
@@ -186,14 +167,17 @@
             e.stopPropagation();
 
             // Some android phone
-            // Throttle, aviod jitter 
-            if(now - lastTime < 90) {
+            // Throttle ,aviod jitter 
+            if(!isIOS && now - lastTime < 80) {
                 return;
             }
 
-            if(touchCurrentY < basePosY +NUM_POS_MAX_Y){
+            if(touchCurrentY < NUM_POS_MAX_Y){
                 touchCurrentY += distanceY ;
-                moveCircle(touchCurrentY)
+                $refreshMain.css('-webkit-transform', 'translateY(' + touchCurrentY  + 'px)');
+                /* $refreshMain.css('transform', 'translateY(' + touchCurrentY + 'px)'); */
+                $arrowMain.css('-webkit-transform', 'rotate(' + -(touchCurrentY * 3) + 'deg)');
+                /* $arrowMain.css('transform', 'rotate(' + -(touchCurrentY * 3) + 'deg)'); */
             } else {
                 doRotate();
                 return;
@@ -213,53 +197,16 @@
         e.preventDefault();
         e.stopPropagation();
         
-        if(touchCurrentY > basePosY + NUM_POS_MIN_Y){
+        if(touchCurrentY > NUM_POS_MIN_Y){
             doRotate();
         } else {
-            var realStartPos = basePosY + NUM_POS_START_Y;
-            if(refreshType == 2) {
-                $refreshMain.css('top', realStartPos + 'px');
-                $refreshMain.css('opacity', 0);
-                $refreshMain.css('-webkit-transform', 'scale(' + 0  + ')');
-            } else {
-                // Distance must greater than NUM_POS_MIN_Y
-                $refreshMain.css('-webkit-transform', 'translateY(' + realStartPos + 'px)');
-            }
+            // Distance must greater than NUM_POS_MIN_Y
+            $refreshMain.css('-webkit-transform', 'translateY(' + NUM_POS_START_Y + 'px)');
+            $refreshMain.css('transform', 'translateY(' + NUM_POS_START_Y + 'px)');
         }
     }
-    
-    /**
-     * moveCircle
-     * touchmove change the circle style
-     *
-     * @param {number} y
-     */
-
-    function moveCircle(y){
-        if(refreshType == 2) {
-            var scaleRate = 40;
-            var scalePer = y / scaleRate > 1 ? 1 : y / scaleRate < 0 ? 0 : y / scaleRate;
-
-            // Change opacity and scale
-            $refreshMain.css('opacity', scalePer);
-            $refreshMain.css('-webkit-transform', 'scale(' + scalePer  + ')');
-           
-            $refreshMain.css('top', basePosY + NUM_POS_START_Y + y + 'px');
-            // need to recover
-        } else {
-            $refreshMain.css('-webkit-transform', 'translateY(' + y  + 'px)');
-        }
-        /* $refreshMain.css('transform', 'translateY(' + y + 'px)'); */
-        $arrowMain.css('-webkit-transform', 'rotate(' + -(y * 3) + 'deg)');
-        /* $arrowMain.css('transform', 'rotate(' + -(y * 3) + 'deg)'); */ 
-
-
-    }
-
 
     function doRotate(){
-        var realTargetPos = basePosY + NUM_POS_TARGET_Y;
-
         isShowLoading = true;
 
         // Do onBegin callback
@@ -267,13 +214,8 @@
             onBegin();
         }
 
-        if(refreshType == 2) {
-            $refreshMain.css('top', realTargetPos + 'px');
-        } else {
-            $refreshMain.css('-webkit-transform', 'translateY(' + realTargetPos + 'px)');
-        }
-
-
+        $refreshMain.css('-webkit-transform', 'translateY(' + NUM_POS_TARGET_Y + 'px)');
+        $refreshMain.css('transform', 'translateY(' + NUM_POS_TARGET_Y + 'px)');
         $arrowWrapper.hide();
 
         // Start animation
@@ -283,10 +225,6 @@
         stopAnimatTimeout = setTimeout(recoverRefresh, maxRotateTime);
     }
 
-    /**
-     * recover Refresh
-     * Hide the circle 
-     */
     function recoverRefresh(){
 
         // For aviod resolve
@@ -298,19 +236,12 @@
         $spinnerWrapper.hide();
 
         setTimeout(function(){
-            var realStartPos = basePosY + NUM_POS_START_Y;
-
+            //TODO: display gently.
             $refreshMain.removeClass(noShowClass);
             
             $refreshMain.hide();
-            
-            if(refreshType == 2) {
-                $refreshMain.css('top', realStartPos + 'px');
-                $refreshMain.css('opacity', 0);
-                $refreshMain.css('-webkit-transform', 'scale(' + 0  + ')');
-            } else {
-                $refreshMain.css('-webkit-transform', 'translateY(' + realStartPos + 'px)');
-            }
+            $refreshMain.css('-webkit-transform', 'translateY(' + NUM_POS_START_Y + 'px)');
+            $refreshMain.css('transform', 'translateY(' + NUM_POS_START_Y + 'px)');
 
             $arrowWrapper.show();
 

@@ -3,6 +3,7 @@
 > Material design pull to resfresh
 > Mobile only
 
+3 types
 
 ## Browser support
 

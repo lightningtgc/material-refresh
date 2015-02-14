@@ -2,6 +2,7 @@
 var gUglify = require('gulp-uglify');
 var gRename = require('gulp-rename');
 var gStylus = require('gulp-stylus');
+var gMinifyCSS = require('gulp-minify-css');
 var gTranspile  = require('gulp-es6-module-transpiler');
 var del = require('del');
 
@@ -10,6 +11,8 @@ var projectName = 'material-refresh';
 var jsName = projectName + '.js';
 var jsMinName = projectName + '.min.js';
 var cssName = projectName + '.css';
+var cssMinName = projectName + '.min.css';
+
 var devPath = './dev';
 var buildPath = './build';
 
@@ -31,6 +34,9 @@ gulp.task('stylus', ['clean'], function(){
 
     gulp.src(paths.srcCSS)
         .pipe(gStylus())
+        .pipe(gulp.dest(paths.destCSS))
+        .pipe(gMinifyCSS())
+        .pipe(gRename(cssMinName))
         .pipe(gulp.dest(paths.destCSS));
 });
 
@@ -61,6 +67,6 @@ gulp.task('build', ['stylus', 'es6module'], function(){
 });
 
 gulp.task('publish', ['stylus', 'es6module'], function(){
-   gulp.src([devPath + '/css/' + cssName, devPath + '/js/' + jsMinName])
+   gulp.src([devPath + '/css/' + cssMinName, devPath + '/js/' + jsMinName])
         .pipe(gulp.dest('./'));
 });

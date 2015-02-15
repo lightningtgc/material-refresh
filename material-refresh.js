@@ -1,5 +1,11 @@
 /**
- * 4 types of refresh
+ * Material Design Swipe To Refresh.   By Gctang.
+ *
+ * Three types of refresh:
+ * 1. Coplanar with or above another surface
+ * 2. Below another surface in z-space. 
+ * 3. Button action refresh
+ *
  *
  * @return {undefined}
  */
@@ -35,7 +41,7 @@
     var NUM_POS_TARGET_Y = 0;
     var NUM_POS_MAX_Y = 65;
     var NUM_POS_MIN_Y = -25;
-    var basePosY = 0;
+    var basePosY = 60;
 
     var touchCurrentY;
     var touchStartY = 0;
@@ -45,9 +51,11 @@
     var onBegin = null;
     var onEnd = null;
     var stopAnimatTimeout = null;
+    
+    var refreshNav = '';
+
     var lastTime = new Date().getTime();
 
-    var refreshType = 2;
 
     var isIOS = $.os.ios;
 
@@ -82,8 +90,8 @@
     /*     maxRotateTime: 3000, */
     /*     onRotateBegin: null, */
     /*     onRotateEnd: null */
+    //     nav: null
 
-        
     /* } */
 
 
@@ -98,22 +106,22 @@
         onBegin = options.onRotateBegin;
         onEnd = options.onRotateEnd;
         maxRotateTime = options.maxRotateTime || maxRotateTime;
-        refreshType = options.type || refreshType;
+        refreshNav = options.nav || refreshNav;
 
-        if($('#muiRefresh').length === 0){
-            renderTmpl();
+        if($('#muirefresh').length === 0){
+            rendertmpl();
 
-            $refreshMain = $('#muiRefresh');
-            $spinnerWrapper = $('.mui-spinner-wrapper', $refreshMain);
-            $arrowWrapper = $('.mui-arrow-wrapper', $refreshMain);
-            $arrowMain = $('.mui-arrow-main', $refreshMain);
+            $refreshmain = $('#muirefresh');
+            $spinnerwrapper = $('.mui-spinner-wrapper', $refreshmain);
+            $arrowwrapper = $('.mui-arrow-wrapper', $refreshmain);
+            $arrowmain = $('.mui-arrow-main', $refreshmain);
 
         }
 
-        // Different types config
-        if (refreshType == 2) {
-            $refreshMain.addClass('mui-refresh-type' + refreshType);
-            basePosY = 60;
+        // Custom nav bar 
+        if (!isDefaultType()) {
+            $refreshMain.addClass('mui-refresh-nav');
+            basePosY = $(refreshNav).height();
         }
 
         bindEvents();
@@ -130,19 +138,26 @@
         }
     }
 
+    // Destory refresh
     mRefresh.destroy = function(){
         unbindEvents();
         $('#muiRefresh').remove();
 
     }
-    
+
+    // Button action refresh
+
+    mRefresh.refresh = function() {
+        // Do rotate
+    }
+
+    // Render html template
     function renderTmpl(){
         document.body.insertAdjacentHTML('beforeend', tmpl);
     }
 
 
     function touchStart(e){
-            e.preventDefault();
         if(isIOS && scrollEl == document.body){
             touchPos.top = window.scrollY;
         }else{
@@ -183,7 +198,6 @@
         if ( touchPos.y2 > touchStartY + verticalThreshold) {
 
             e.preventDefault();
-            e.stopPropagation();
 
             // Some android phone
             // Throttle, aviod jitter 
@@ -211,13 +225,12 @@
             return false;
         }
         e.preventDefault();
-        e.stopPropagation();
         
         if(touchCurrentY > basePosY + NUM_POS_MIN_Y){
             doRotate();
         } else {
             var realStartPos = basePosY + NUM_POS_START_Y;
-            if(refreshType == 2) {
+            if ( isDefaultType() ) {
                 $refreshMain.css('top', realStartPos + 'px');
                 $refreshMain.css('opacity', 0);
                 $refreshMain.css('-webkit-transform', 'scale(' + 0  + ')');
@@ -236,7 +249,7 @@
      */
 
     function moveCircle(y){
-        if(refreshType == 2) {
+        if (isDefaultType()) {
             var scaleRate = 40;
             var scalePer = y / scaleRate > 1 ? 1 : y / scaleRate < 0 ? 0 : y / scaleRate;
 
@@ -267,7 +280,7 @@
             onBegin();
         }
 
-        if(refreshType == 2) {
+        if (isDefaultType()) {
             $refreshMain.css('top', realTargetPos + 'px');
         } else {
             $refreshMain.css('-webkit-transform', 'translateY(' + realTargetPos + 'px)');
@@ -304,7 +317,7 @@
             
             $refreshMain.hide();
             
-            if(refreshType == 2) {
+            if (isDefaultType()) {
                 $refreshMain.css('top', realStartPos + 'px');
                 $refreshMain.css('opacity', 0);
                 $refreshMain.css('-webkit-transform', 'scale(' + 0  + ')');
@@ -322,6 +335,10 @@
             }
 
         }, 500); 
+    }
+
+    function isDefaultType(){
+       return $(refreshNav).length === 0;
     }
 
     function bindEvents(){

@@ -3,7 +3,14 @@
 > Material design pull to resfresh
 > Mobile only
 
-3 types
+## Three Types and preview
+
+Type1: `Above surface` (Default)
+
+Type2: `Below surface`
+
+Type3: `Button action`
+
 
 ## Browser support
 

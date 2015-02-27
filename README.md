@@ -2,7 +2,9 @@
 
 > Material design pull to resfresh
 
-> High Performance,and not affect the page structure
+> High Performance
+
+> Not impact the structure of sites
 
 > Mobile only
 

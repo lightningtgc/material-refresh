@@ -7,9 +7,22 @@
     <title>Material Design 下拉刷新</title>
     <link rel="stylesheet" href="material-refresh.css" />
     <link rel="stylesheet" href="styles/css/demo.css" />
+    <style type="text/css">
+        .nav {
+            position:fixed;
+            top:0px;
+            z-index:100;
+
+            height:50px;
+            width:100%;
+            background-color: orange;
+
+        } 
+    </style>
 </head>
 <body>
   <h2>Today</h2>
+  <div id="nav" class="nav"></div>
   <div id="wordContent" class="content">
       <ul>
         <li>Bruch this weekend?</li>
@@ -93,7 +106,9 @@
   <script type="text/javascript" src="material-refresh.js"></script>
 
   <script type="text/javascript">
-    mRefresh();
+    mRefresh({
+        nav: '#nav'
+    });
   </script>
 </body>
 </html>

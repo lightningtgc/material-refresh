@@ -41,12 +41,12 @@
     var NUM_POS_TARGET_Y = 0;
     var NUM_POS_MAX_Y = 65;
     var NUM_POS_MIN_Y = -25;
-    var basePosY = 60;
 
     var touchCurrentY;
     var touchStartY = 0;
     var verticalThreshold = 2;
     var maxRotateTime = 3000;
+    var basePosY = 60;
 
     var onBegin = null;
     var onEnd = null;
@@ -109,12 +109,12 @@
         refreshNav = options.nav || refreshNav;
 
         if($('#muirefresh').length === 0){
-            rendertmpl();
+            renderTmpl();
 
-            $refreshmain = $('#muirefresh');
-            $spinnerwrapper = $('.mui-spinner-wrapper', $refreshmain);
-            $arrowwrapper = $('.mui-arrow-wrapper', $refreshmain);
-            $arrowmain = $('.mui-arrow-main', $refreshmain);
+            $refreshMain = $('#muiRefresh');
+            $spinnerWrapper = $('.mui-spinner-wrapper', $refreshMain);
+            $arrowWrapper = $('.mui-arrow-wrapper', $refreshMain);
+            $arrowMain = $('.mui-arrow-main', $refreshMain);
 
         }
 
@@ -141,7 +141,7 @@
     // Destory refresh
     mRefresh.destroy = function(){
         unbindEvents();
-        $('#muiRefresh').remove();
+        $refreshMain.remove();
 
     }
 
@@ -164,14 +164,14 @@
             touchPos.top = document.body.scrollTop;//初始scrollTo
         }
 
-        if(touchPos.top > 0 || isShowLoading){
+        if (touchPos.top > 0 || isShowLoading) {
             return;
         }
 
         touchCurrentY = NUM_POS_START_Y;
         $refreshMain.show();
         
-        if(e.touches[0]){
+        if (e.touches[0]) {
             touchPos.x1 = e.touches[0].pageX;
             touchStartY = touchPos.y1 = e.touches[0].pageY;
         }
@@ -181,11 +181,10 @@
         var thisTouch, distanceY;
         var now = new Date().getTime();
 
-        if(touchPos.top > 0 || isShowLoading || !e.touches || e.touches.length !== 1){
+        if (touchPos.top > 0 || isShowLoading || !e.touches || e.touches.length !== 1) {
             // Just allow one finger
             return;
         }
-
 
         thisTouch = e.touches[0];
 
@@ -195,17 +194,17 @@
         // Distance for pageY change
         distanceY = touchPos.y2 - touchPos.y1;
 
-        if ( touchPos.y2 > touchStartY + verticalThreshold) {
+        if (touchPos.y2 > touchStartY + verticalThreshold) {
 
             e.preventDefault();
 
             // Some android phone
             // Throttle, aviod jitter 
-            if(now - lastTime < 90) {
+            if (now - lastTime < 90) {
                 return;
             }
 
-            if(touchCurrentY < basePosY +NUM_POS_MAX_Y){
+            if (touchCurrentY < basePosY + NUM_POS_MAX_Y) {
                 touchCurrentY += distanceY ;
                 moveCircle(touchCurrentY)
             } else {
@@ -215,32 +214,36 @@
 
         }
 
-        // y1 is always the current pageY
+        // y1 always is the current pageY
         touchPos.y1 = thisTouch.pageY;
         lastTime = now;
     }
 
     function touchEnd(e){
-        if(touchPos.top > 0 || isShowLoading){
-            return false;
+        if (touchPos.top > 0 || isShowLoading) {
+            return;
         }
         e.preventDefault();
         
-        if(touchCurrentY > basePosY + NUM_POS_MIN_Y){
+        if (touchCurrentY > basePosY + NUM_POS_MIN_Y) {
             doRotate();
         } else {
-            var realStartPos = basePosY + NUM_POS_START_Y;
-            if ( isDefaultType() ) {
-                $refreshMain.css('top', realStartPos + 'px');
-                $refreshMain.css('opacity', 0);
-                $refreshMain.css('-webkit-transform', 'scale(' + 0  + ')');
-            } else {
-                // Distance must greater than NUM_POS_MIN_Y
-                $refreshMain.css('-webkit-transform', 'translateY(' + realStartPos + 'px)');
-            }
+            backToStart();
         }
     }
     
+    function backToStart() {
+        var realStartPos = basePosY + NUM_POS_START_Y;
+        if ( isDefaultType() ) {
+            $refreshMain.css('top', realStartPos + 'px');
+            $refreshMain.css('opacity', 0);
+            $refreshMain.css('-webkit-transform', 'scale(' + 0  + ')');
+        } else {
+            // Distance must greater than NUM_POS_MIN_Y
+            $refreshMain.css('-webkit-transform', 'translateY(' + realStartPos + 'px)');
+        }
+    }
+
     /**
      * moveCircle
      * touchmove change the circle style
@@ -262,14 +265,17 @@
         } else {
             $refreshMain.css('-webkit-transform', 'translateY(' + y  + 'px)');
         }
-        /* $refreshMain.css('transform', 'translateY(' + y + 'px)'); */
         $arrowMain.css('-webkit-transform', 'rotate(' + -(y * 3) + 'deg)');
         /* $arrowMain.css('transform', 'rotate(' + -(y * 3) + 'deg)'); */ 
-
 
     }
 
 
+    /**
+     * doRotate
+     * Rotate the circle,and you can stop it by `mRefresh.resolve()`
+     * or it wil stop within the time: `maxRotateTime`
+     */
     function doRotate(){
         var realTargetPos = basePosY + NUM_POS_TARGET_Y;
 
@@ -311,19 +317,11 @@
         $spinnerWrapper.hide();
 
         setTimeout(function(){
-            var realStartPos = basePosY + NUM_POS_START_Y;
-
             $refreshMain.removeClass(noShowClass);
-            
             $refreshMain.hide();
             
-            if (isDefaultType()) {
-                $refreshMain.css('top', realStartPos + 'px');
-                $refreshMain.css('opacity', 0);
-                $refreshMain.css('-webkit-transform', 'scale(' + 0  + ')');
-            } else {
-                $refreshMain.css('-webkit-transform', 'translateY(' + realStartPos + 'px)');
-            }
+            
+            backToStart();
 
             $arrowWrapper.show();
 
@@ -337,6 +335,12 @@
         }, 500); 
     }
 
+    /**
+     * isDefaultType
+     * Check is type1: Above surface
+     *
+     * @return {Boolen}
+     */
     function isDefaultType(){
        return $(refreshNav).length === 0;
     }

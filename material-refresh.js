@@ -20,7 +20,6 @@
 
     /**
      * TODO list:
-     * * custom position
      * * theme extract
      *
      */
@@ -37,13 +36,15 @@
     var isShowLoading = false;
     var isStoping = false;
 
-    var NUM_POS_START_Y = -70;
+    var NUM_POS_START_Y = -85;
     var NUM_POS_TARGET_Y = 0;
     var NUM_POS_MAX_Y = 65;
     var NUM_POS_MIN_Y = -25;
+    var NUM_NAV_TARGET_ADDY = 20; // For custom nav bar
 
     var touchCurrentY;
     var touchStartY = 0;
+    var customNavTop = 0;
     var verticalThreshold = 2;
     var maxRotateTime = 3000;
     var basePosY = 60;
@@ -56,10 +57,9 @@
 
     var lastTime = new Date().getTime();
 
-
     var isIOS = $.os.ios;
 
-    var tmpl = '<div id="muiRefresh" class="mui-refresh-main mui-blue-theme">\
+    var tmpl = '<div id="muiRefresh" class="mui-refresh-main mui-blue-theme" >\
         <div class="mui-refresh-wrapper ">\
             <div class="mui-arrow-wrapper">\
                 <div class="mui-arrow-main"></div>\
@@ -87,9 +87,9 @@
 
     /* var opts = { */
     /*     scrollEl: null, */
-    /*     maxRotateTime: 3000, */
-    /*     onRotateBegin: null, */
-    /*     onRotateEnd: null */
+    /*     maxTime: 3000, */
+    /*     onBegin: null, */
+    /*     onEnd: null */
     //     nav: null
 
     /* } */
@@ -103,29 +103,37 @@
         $scrollEl = $(scrollEl);
 
         // extend options
-        onBegin = options.onRotateBegin;
-        onEnd = options.onRotateEnd;
-        maxRotateTime = options.maxRotateTime || maxRotateTime;
+        onBegin = options.onBegin;
+        onEnd = options.onEnd;
+        maxRotateTime = options.maxTime || maxRotateTime;
         refreshNav = options.nav || refreshNav;
 
-        if($('#muirefresh').length === 0){
+        if ($('#muirefresh').length === 0) {
             renderTmpl();
 
             $refreshMain = $('#muiRefresh');
             $spinnerWrapper = $('.mui-spinner-wrapper', $refreshMain);
             $arrowWrapper = $('.mui-arrow-wrapper', $refreshMain);
             $arrowMain = $('.mui-arrow-main', $refreshMain);
-
         }
 
         // Custom nav bar 
         if (!isDefaultType()) {
             $refreshMain.addClass('mui-refresh-nav');
-            basePosY = $(refreshNav).height();
+            basePosY = $(refreshNav).height() + 20;
+            if($(refreshNav).offset()){
+                customNavTop = $(refreshNav).offset().top;
+                basePosY += customNavTop;
+                // Set init Y position
+                $refreshMain.css('top', customNavTop + 'px');
+            }
+
+            //Set z-index to make sure ablow the nav bar
+            var navIndex = $(refreshNav).css('z-index');
+            $refreshMain.css('z-index', navIndex - 1);
         }
 
         bindEvents();
-
     }
 
     // Finish loading
@@ -161,14 +169,14 @@
         if(isIOS && scrollEl == document.body){
             touchPos.top = window.scrollY;
         }else{
-            touchPos.top = document.body.scrollTop;//初始scrollTo
+            touchPos.top = document.body.scrollTop;
         }
 
         if (touchPos.top > 0 || isShowLoading) {
             return;
         }
 
-        touchCurrentY = NUM_POS_START_Y;
+        touchCurrentY = basePosY + NUM_POS_START_Y;
         $refreshMain.show();
         
         if (e.touches[0]) {
@@ -194,9 +202,8 @@
         // Distance for pageY change
         distanceY = touchPos.y2 - touchPos.y1;
 
-        if (touchPos.y2 > touchStartY + verticalThreshold) {
-
-            e.preventDefault();
+        if (touchPos.y2 - touchStartY + verticalThreshold > 0) {
+            e.preventDefault();  
 
             // Some android phone
             // Throttle, aviod jitter 
@@ -204,9 +211,9 @@
                 return;
             }
 
-            if (touchCurrentY < basePosY + NUM_POS_MAX_Y) {
+            if (touchCurrentY < basePosY - customNavTop + NUM_POS_MAX_Y) {
                 touchCurrentY += distanceY ;
-                moveCircle(touchCurrentY)
+                moveCircle(touchCurrentY);
             } else {
                 doRotate();
                 return;
@@ -225,7 +232,8 @@
         }
         e.preventDefault();
         
-        if (touchCurrentY > basePosY + NUM_POS_MIN_Y) {
+        if (touchCurrentY > basePosY - customNavTop + NUM_POS_MIN_Y) {
+
             doRotate();
         } else {
             backToStart();
@@ -236,12 +244,16 @@
         var realStartPos = basePosY + NUM_POS_START_Y;
         if ( isDefaultType() ) {
             $refreshMain.css('top', realStartPos + 'px');
-            $refreshMain.css('opacity', 0);
             $refreshMain.css('-webkit-transform', 'scale(' + 0  + ')');
         } else {
             // Distance must greater than NUM_POS_MIN_Y
-            $refreshMain.css('-webkit-transform', 'translateY(' + realStartPos + 'px)');
+            $refreshMain.css('top', customNavTop + 'px');
+            /* $refreshMain.css('-webkit-transform', 'translateY(' + realStartPos + 'px)'); */
         }
+        setTimeout(function(){
+            $refreshMain.css('opacity', 0);
+            $refreshMain.hide();
+        }, 300);
     }
 
     /**
@@ -252,18 +264,21 @@
      */
 
     function moveCircle(y){
+        var scaleRate = 40;
+        var scalePer = y / scaleRate > 1 ? 1 : y / scaleRate < 0 ? 0 : y / scaleRate;
+        var currMoveY = basePosY + NUM_POS_START_Y + y;
         if (isDefaultType()) {
-            var scaleRate = 40;
-            var scalePer = y / scaleRate > 1 ? 1 : y / scaleRate < 0 ? 0 : y / scaleRate;
-
-            // Change opacity and scale
+           
             $refreshMain.css('opacity', scalePer);
+            // Change opacity and scale
             $refreshMain.css('-webkit-transform', 'scale(' + scalePer  + ')');
            
-            $refreshMain.css('top', basePosY + NUM_POS_START_Y + y + 'px');
+            $refreshMain.css('top', currMoveY + 'px');
             // need to recover
         } else {
-            $refreshMain.css('-webkit-transform', 'translateY(' + y  + 'px)');
+            $refreshMain.css('opacity', scalePer);
+            $refreshMain.css('top', currMoveY + 'px');
+            /* $refreshMain.css('-webkit-transform', 'translateY('+ y + 'px)'); */
         }
         $arrowMain.css('-webkit-transform', 'rotate(' + -(y * 3) + 'deg)');
         /* $arrowMain.css('transform', 'rotate(' + -(y * 3) + 'deg)'); */ 
@@ -277,7 +292,7 @@
      * or it wil stop within the time: `maxRotateTime`
      */
     function doRotate(){
-        var realTargetPos = basePosY + NUM_POS_TARGET_Y;
+        var realTargetPos = basePosY + NUM_POS_TARGET_Y - 20;
 
         isShowLoading = true;
 
@@ -286,12 +301,16 @@
             onBegin();
         }
 
+        // Make sure display entirely
+        $refreshMain.css('opacity', 1);
+
         if (isDefaultType()) {
             $refreshMain.css('top', realTargetPos + 'px');
         } else {
-            $refreshMain.css('-webkit-transform', 'translateY(' + realTargetPos + 'px)');
+            realTargetPos = realTargetPos + NUM_NAV_TARGET_ADDY;
+            $refreshMain.css('top', realTargetPos + 'px');
+            /* $refreshMain.css('-webkit-transform', 'translateY(' + realTargetPos + 'px)'); */
         }
-
 
         $arrowWrapper.hide();
 
@@ -312,6 +331,7 @@
         isStoping = true;
 
         // Stop animation 
+        // translate and scale can't use together
         $refreshMain.addClass(noShowClass);
 
         $spinnerWrapper.hide();
@@ -319,7 +339,6 @@
         setTimeout(function(){
             $refreshMain.removeClass(noShowClass);
             $refreshMain.hide();
-            
             
             backToStart();
 

@@ -1,34 +1,17 @@
 /**
- * Material Design Swipe To Refresh.   By Gctang.
+ * Google Material Design Swipe To Refresh.   
+ * By Gctang(https://github.com/lightningtgc)
  *
  * Three types of refresh:
- * 1. Coplanar with or above another surface
+ * 1. Above or coplanar with another surface
  * 2. Below another surface in z-space. 
  * 3. Button action refresh
  *
- *
- * @return {undefined}
  */
 
-
 ;(function($){
-
-    /* Known issue: 
-     * 1.iOS feature when scrolling ,animation will stop  
-     * 2. Animation display issue in anfroid like miui小米
-     */
-
-    /**
-     * TODO list:
-     * * theme extract
-     *
-     */
-
-    // DOM
     var $scrollEl = $(document.body);
-
     var $refreshMain, $spinnerWrapper, $arrowWrapper, $arrowMain;
-
     var scrollEl = document.body;
 
     var noShowClass = 'mui-refresh-noshow';
@@ -37,9 +20,9 @@
     var isStoping = false;
 
     var NUM_POS_START_Y = -85;
-    var NUM_POS_TARGET_Y = 0;
-    var NUM_POS_MAX_Y = 65;
-    var NUM_POS_MIN_Y = -25;
+    var NUM_POS_TARGET_Y = 0; // Where to stop
+    var NUM_POS_MAX_Y = 65;   // Max position for the moving distance
+    var NUM_POS_MIN_Y = -25;  // Min position for the moving distance
     var NUM_NAV_TARGET_ADDY = 20; // For custom nav bar
 
     var touchCurrentY;
@@ -77,24 +60,39 @@
         </div>\
     </div>';
 
+    // Defined the object to improve performance
     var touchPos = {
         top: 0,
         x1: 0,
-        x2: 0
+        x2: 0,
+        y1: 0,
+        y2: 0
     }
 
-
-
+    // Default options 
     /* var opts = { */
-    /*     scrollEl: null, */
-    /*     maxTime: 3000, */
-    /*     onBegin: null, */
-    /*     onEnd: null */
-    //     nav: null
-
+    /*     scrollEl: null, //String  */
+    /*     maxTime: 3000, //Number */
+    /*     onBegin: null, //Function */
+    /*     onEnd: null, //Function */
+    /*     nav: null, //String */
+    /*     index: 10001, //Number*/
+    /*     top: '0px' //String */
     /* } */
 
+    
+    /* Known issue: 
+     * 1.iOS feature when scrolling ,animation will stop  
+     * 2. Animation display issue in anfroid like miui小米
+     */
 
+    /**
+     * TODO list:
+     * * theme extract
+     *
+     */
+
+    // Main function to init the refresh style
     function mRefresh(options) {
         options = options || {};
 
@@ -133,6 +131,16 @@
             $refreshMain.css('z-index', navIndex - 1);
         }
 
+        //Set custom z-index
+        if(options.index){
+            $refreshMain.css('z-index', ~~options.index);
+        }
+
+        //Set custom top, to change the position
+        if(options.top){
+            $refreshMain.css('top', options.top);
+        }
+
         bindEvents();
     }
 
@@ -154,9 +162,17 @@
     }
 
     // Button action refresh
-
     mRefresh.refresh = function() {
+        var realTargetPos = basePosY + NUM_POS_TARGET_Y + 140;
         // Do rotate
+        if(!isShowLoading){
+            if ( isDefaultType() ) {
+                $refreshMain.css('-webkit-transform', 'scale(' + 0.01  + ')');
+            }
+            $refreshMain.css('opacity', 1);
+            $refreshMain.css('top', realTargetPos + 'px');
+            doRotate();
+        }
     }
 
     // Render html template
@@ -215,6 +231,7 @@
                 touchCurrentY += distanceY ;
                 moveCircle(touchCurrentY);
             } else {
+                // Move over the max position will do the rotate
                 doRotate();
                 return;
             }
@@ -233,7 +250,7 @@
         e.preventDefault();
         
         if (touchCurrentY > basePosY - customNavTop + NUM_POS_MIN_Y) {
-
+            // Should move over the min position
             doRotate();
         } else {
             backToStart();
@@ -251,8 +268,11 @@
             /* $refreshMain.css('-webkit-transform', 'translateY(' + realStartPos + 'px)'); */
         }
         setTimeout(function(){
-            $refreshMain.css('opacity', 0);
-            $refreshMain.hide();
+            // Handle button action
+            if(!isShowLoading){
+                $refreshMain.css('opacity', 0);
+                $refreshMain.hide();
+            }
         }, 300);
     }
 
@@ -267,19 +287,16 @@
         var scaleRate = 40;
         var scalePer = y / scaleRate > 1 ? 1 : y / scaleRate < 0 ? 0 : y / scaleRate;
         var currMoveY = basePosY + NUM_POS_START_Y + y;
+
         if (isDefaultType()) {
-           
-            $refreshMain.css('opacity', scalePer);
-            // Change opacity and scale
+            // Small to Big
             $refreshMain.css('-webkit-transform', 'scale(' + scalePer  + ')');
-           
-            $refreshMain.css('top', currMoveY + 'px');
-            // need to recover
-        } else {
-            $refreshMain.css('opacity', scalePer);
-            $refreshMain.css('top', currMoveY + 'px');
-            /* $refreshMain.css('-webkit-transform', 'translateY('+ y + 'px)'); */
         }
+        /* $refreshMain.css('-webkit-transform', 'translateY('+ y + 'px)'); */
+
+        $refreshMain.css('opacity', scalePer);
+        // Change the position
+        $refreshMain.css('top', currMoveY + 'px');
         $arrowMain.css('-webkit-transform', 'rotate(' + -(y * 3) + 'deg)');
         /* $arrowMain.css('transform', 'rotate(' + -(y * 3) + 'deg)'); */ 
 
@@ -303,14 +320,13 @@
 
         // Make sure display entirely
         $refreshMain.css('opacity', 1);
+        $refreshMain.css('-webkit-transform', 'scale(' + 1  + ')');
 
-        if (isDefaultType()) {
-            $refreshMain.css('top', realTargetPos + 'px');
-        } else {
+        if (!isDefaultType()) {
             realTargetPos = realTargetPos + NUM_NAV_TARGET_ADDY;
-            $refreshMain.css('top', realTargetPos + 'px');
-            /* $refreshMain.css('-webkit-transform', 'translateY(' + realTargetPos + 'px)'); */
         }
+        $refreshMain.css('top', realTargetPos + 'px');
+        /* $refreshMain.css('-webkit-transform', 'translateY(' + realTargetPos + 'px)'); */
 
         $arrowWrapper.hide();
 
@@ -322,7 +338,7 @@
     }
 
     /**
-     * recover Refresh
+     * Recover Refresh
      * Hide the circle 
      */
     function recoverRefresh(){
@@ -360,17 +376,17 @@
      *
      * @return {Boolen}
      */
-    function isDefaultType(){
+    function isDefaultType() {
        return $(refreshNav).length === 0;
     }
 
-    function bindEvents(){
+    function bindEvents() {
         $scrollEl.on('touchstart', touchStart);
         $scrollEl.on('touchmove', touchMove);
         $scrollEl.on('touchend', touchEnd);
     }
 
-    function unbindEvents(){
+    function unbindEvents() {
         $scrollEl.off('touchstart', touchStart);
         $scrollEl.off('touchmove', touchMove);
         $scrollEl.off('touchend', touchEnd);

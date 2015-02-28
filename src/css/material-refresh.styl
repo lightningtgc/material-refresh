@@ -2,7 +2,6 @@ blueSpinColor = #2196F3
 
 .mui-refresh-main 
     position: absolute
-    top: 20px
     left:50%
     margin-left: -25px
     padding: 9px
@@ -10,11 +9,8 @@ blueSpinColor = #2196F3
 
     background-color: #FFF
     overflow: hidden
-    border-radius: 999px /* hack android 2.3*/
-    /* transition: box-shadow 0.38s cubic-bezier(0.4, 0, 0.2, 1) */
-    /* transition: all 0.43s cubic-bezier(.08,.55,.81,1.8) */
-    -webkit-transition: all 0.43s cubic-bezier(.08,.55,.81,1.8)
-    /* -webkit-transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1) */
+    border-radius: 999px /* hack android 2.3*/  
+    
     box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.19), 0 6px 13px 0 rgba(0, 0, 0, 0.24)
     -webkit-box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.19), 0 6px 13px 0 rgba(0, 0, 0, 0.24)
 
@@ -28,6 +24,14 @@ blueSpinColor = #2196F3
     opacity: 0 
     -webkit-transform: scale(0) 
 } 
+
+/*transition*/
+.mui-refresh-main-animat {
+    /* transition: box-shadow 0.38s cubic-bezier(0.4, 0, 0.2, 1) */
+    /* -webkit-transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1) */
+    /* transition: all 0.43s cubic-bezier(.08,.55,.81,1.8) */
+    -webkit-transition: all 0.43s cubic-bezier(.08,.55,.81,1.8)
+}
 
 /* below nav bar */
 .mui-refresh-nav

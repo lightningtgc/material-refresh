@@ -18,6 +18,7 @@
 
     var isShowLoading = false;
     var isStoping = false;
+    var isBtnAction = false;
 
     var NUM_POS_START_Y = -85;
     var NUM_POS_TARGET_Y = 0; // Where to stop
@@ -42,7 +43,7 @@
 
     var isIOS = $.os.ios;
 
-    var tmpl = '<div id="muiRefresh" class="mui-refresh-main mui-blue-theme" >\
+    var tmpl = '<div id="muiRefresh" class="mui-refresh-main mui-refresh-main-animat mui-blue-theme" >\
         <div class="mui-refresh-wrapper ">\
             <div class="mui-arrow-wrapper">\
                 <div class="mui-arrow-main"></div>\
@@ -163,15 +164,26 @@
 
     // Button action refresh
     mRefresh.refresh = function() {
-        var realTargetPos = basePosY + NUM_POS_TARGET_Y + 140;
+
         // Do rotate
         if(!isShowLoading){
-            if ( isDefaultType() ) {
-                $refreshMain.css('-webkit-transform', 'scale(' + 0.01  + ')');
+            var realTargetPos = basePosY + NUM_POS_TARGET_Y - 20;
+            if (!isDefaultType()) {
+                realTargetPos = realTargetPos + NUM_NAV_TARGET_ADDY;
             }
-            $refreshMain.css('opacity', 1);
+            isShowLoading = true;
+            isBtnAction = true;
+            //Romove animat time
+            $refreshMain.removeClass('mui-refresh-main-animat');
+            // move to target position
             $refreshMain.css('top', realTargetPos + 'px');
-            doRotate();
+            // show it
+            $refreshMain.css('opacity', 1);
+            
+            // make it small
+            $refreshMain.css('-webkit-transform', 'scale(' + 0.01  + ')');
+            
+            setTimeout(doRotate, 60);
         }
     }
 
@@ -318,9 +330,13 @@
             onBegin();
         }
 
-        // Make sure display entirely
-        $refreshMain.css('opacity', 1);
-        $refreshMain.css('-webkit-transform', 'scale(' + 1  + ')');
+        if (!isBtnAction) { 
+            // Make sure display entirely
+            $refreshMain.css('opacity', 1);
+        } else {
+            $refreshMain.addClass('mui-refresh-main-animat');
+            $refreshMain.css('-webkit-transform', 'scale(' + 1  + ')');
+        }
 
         if (!isDefaultType()) {
             realTargetPos = realTargetPos + NUM_NAV_TARGET_ADDY;
@@ -362,6 +378,7 @@
 
             isShowLoading = false;
             isStoping = false;
+            isBtnAction = false;
 
             if (typeof onEnd === 'function') {
                 onEnd();

@@ -90,6 +90,11 @@
     /* Known issue: 
      * 1. iOS feature when scrolling ,animation will stop  
      * 2. Animation display issue in anfroid like miui小米
+     *
+     *
+     * TODO list:
+     * 1. Using translate and scale together to replace top 
+     * 2. Optimize circle rotate animation
      */
 
     // Main function to init the refresh style
@@ -372,12 +377,10 @@
      * Hide the circle 
      */
     function recoverRefresh(){
-
         // For aviod resolve
         isStoping = true;
 
         // Stop animation 
-        // translate and scale can't use together
         $refreshMain.addClass(noShowClass);
 
         $spinnerWrapper.hide();

@@ -4,13 +4,11 @@
 
 > Mobile only
 
-Material Design swipe (pull) to refresh.
+Google Material Design swipe (pull) to refresh.
 
 It uses CSS3 and JavaScript depend on [Zepto](https://github.com/madrobby/zepto) or [jQuery](https://github.com/jquery/jquery).
 
-Actually, it's easy to convert the dependent js library 
-
-or just use the vanilla JavaScript.
+Actually, it's easy to convert the dependent js library or just use the vanilla JavaScript.
 
 It's high performancenot which not impact the structure of sites.
 
@@ -251,13 +249,12 @@ Then the refresher will below the surface of the `navMain` element.
 #### Type3: Button action
 
 If you had inited the refresher,you can bind the DOM event by using:
-
-When you click the `buttonAction` element, the refresher will show.
 ```js
 $('#buttonAction').on('tap', function(){
   mRefresh.resolve();
 });
 ```
+When you click the `buttonAction` element, the refresher will show.
 
 If you want to get some callback when start or stop to refresh,by using `onBegin` or `onEnd`:
 

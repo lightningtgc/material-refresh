@@ -14,16 +14,16 @@ It's high performancenot which not impact the structure of sites.
 
 ## Types and preview
 
-Type1: `Above surface` (default)
+##### Type1: `Above surface` (default)
 
 <img src="https://raw.githubusercontent.com/lightningtgc/material-refresh/gh-pages/styles/images/above.gif" />
 
-Type2: `Below surface`
+##### Type2: `Below surface`
 
 <img src="https://raw.githubusercontent.com/lightningtgc/material-refresh/gh-pages/styles/images/below.gif" />
  <img src="https://raw.githubusercontent.com/lightningtgc/material-refresh/gh-pages/styles/images/below-color.gif" />
 
-Type3: `Button action`
+##### Type3: `Button action`
 
 <img src="https://raw.githubusercontent.com/lightningtgc/material-refresh/gh-pages/styles/images/button-action.gif" />
 
@@ -100,7 +100,7 @@ mRefresh.resolve();
 
 ##### nav: 
 
--- Using for turn into Type2, refresh body will below the nav surface
+-- Using for turn into `Type2`, refresh body will below the nav surface
  
 ```js
 // Example
@@ -150,7 +150,7 @@ var opts = {
 
 -- You can change its position finally by setting this option.
 
--- Default{ Type1 :'0px', Type2: depend on the height and top of the nav element }
+-- Default{ `Type1` :'0px', `Type2`: depend on the height and top of the nav element }
 
 ```js
 var opts = {
@@ -162,7 +162,7 @@ var opts = {
 
 -- Set `z-index` of the refresher to change it in z-space.
 
--- Default { Type1: 10001,  Type2: (the z-index of nav element) - 1}
+-- Default { `Type1`: 10001,  `Type2`: (the z-index of nav element) - 1}
 
 ```js
 var opts = {
@@ -228,7 +228,7 @@ mRefresh(opts);
 
 #### Type2: Below surface
 
-Use Type2 by setting the option `nav` to the top of the elements:
+Use `Type2` by setting the option `nav` to the top of the elements:
 
 ```js
 // example
@@ -276,7 +276,7 @@ $('#buttonAction').on('tap', function(){
 
 ```
 
-If you want not to trigger Type1 or Type2, and just need Type3.
+If you want not to trigger `Type1` or `Type2`, and just need `Type3`.
 
 ```js
 var opts = {

@@ -68,6 +68,12 @@ mRefresh();
 mRefresh.resolve();
 ```
 
+## Relations of three types
+
+* Type1 and Type2 can not use in the same time.
+* Type3 is depend on Type1 or Type2, cause it will determine the refresher position 
+* Type3 and (Type1 or Type2) can use in the same time.
+
 ## Advanced usage
 
 #### Options
@@ -88,37 +94,35 @@ mRefresh.resolve();
     mRefresh(opts);
 ```
 
-* nav: 
+##### nav: 
 
 -- Using for turn into Type2, refresh body will below the nav surface
  
-eg: 
 ```js
+// Example
 var opts = {
-  nav: '#navigation'
+  nav: '#navMain'
 }
 ```
 
-* scrollEl: 
+##### scrollEl: 
 
--- custom scroll wrapper element, decide which elemnt will allow trigger refresh action.
+-- Custom scroll wrapper element, decide which elemnt will allow trigger refresh action.
 
-(Default:{ ios:document.body, android: document})
+-- Default:{ ios:document.body,  android: document }
 
-eg: 
 ```js
 var opts = {
   scrollEl: '#mainWrapper'
 }
 ```
 
-* onBegin: (Callback Function)
+##### onBegin: (Callback Function)
 
--- Tigger when the refresh body start to rotate because of the right gesture(swipe). 
+-- Trigger when the refresh body `start` to rotate because of the right gesture(swipe). 
 
 -- You can use this callback to pull ajax data or other action.
 
-eg:
 ```js
 var opts = {
   onBegin: function(){
@@ -130,22 +134,168 @@ var opts = {
 }
 
 
-* onEnd:
+##### onEnd: (Callback Function)
 
-* top:
+-- Trigger when `finished` the refresh 
 
-* theme:
+-- Using like `onBegin`
 
-* index:
+##### top: 
 
-* maxTime:
+-- Set `top` of the refresher. 
 
-* freeze:
+-- You can change its position finally by setting this option.
+
+-- Default{ Type1 :'0px', Type2: depend on the height and top of the nav element }
+
+```js
+var opts = {
+  top: '50px'
+}
+```
+
+##### index:
+
+-- Set `z-index` of the refresher to change it in z-space.
+
+-- Default { Type1: 10001,  Type2: (the z-index of nav element) - 1}
+
+```js
+var opts = {
+  index: 99
+}
+```
+
+##### theme: (Default: 'mui-blue-theme')
+
+-- Set color or custom style of the refresher. 
+
+-- You can write your own style in css file by using the className like 'mui-somecolor-theme'
+
+```js
+var opts = {
+  theme: 'mui-red-theme'
+}
+```
+
+##### maxTime: (Default: 6000ms)
+
+-- Refresher will stop in the maxTime if you don't use `mRefresh.resolve()` to stop it.
+
+-- You can change this maxTime  to make it longer or shorter.
+
+```js
+var opts = {
+  maxTime: 2000
+}
+```
+
+##### freeze: (Default: false)
+
+-- The touch event of the refresher will not trigger if freeze is true.
+
+-- You can use this option to prevent `Type1` or `Type2` and just allow `Type3: button action`
+
+```js
+var opts = {
+  freeze: true
+}
+```
 
 #### Type1: Above surface
 
+You can custom your own refresher like:
 
+```js
+var opts = {
+    maxTime: 3000,
+    onBegin: function(){
+      $.get('/whatevs.html', function(response){
+        $('#someDom').append(response);
+      });
+    },
+    onEnd: function(){
+      alert('Finish the refresh');
+    }
+}
 
+mRefresh(opts);
+```
+
+#### Type2: Below surface
+
+Use Type2 by setting the option `nav` to the top of the elements:
+
+```js
+// example
+var opts = {
+    nav: '#navMain',
+    onBegin: function(){
+      $.get('/whatevs.html', function(response){
+        $('#someDom').append(response);
+      });
+    }
+}
+
+mRefresh(opts);
+```
+
+Then the refresher will below the surface of the `navMain` element.
+
+#### Type3: Button action
+
+If you had inited the refresher,you can bind the DOM event by using:
+
+When you click the `buttonAction` element, the refresher will show.
+```js
+$('#buttonAction').on('tap', function(){
+  mRefresh.resolve();
+});
+```
+
+If you want to get some callback when start or stop to refresh,by using `onBegin` or `onEnd`:
+
+```js
+$('#buttonAction').on('tap', function(){
+  var resolveOpts = {
+    onBegin: function(){
+      // Do something
+      $.get('/whatevs.html', function(response){
+        $('#someDom').append(response);
+      });
+    },
+    onEnd: function(){
+      alert('Finish!')
+    }
+  }
+  mRefresh.resolve();
+});
+
+```
+
+If you want not to trigger Type1 or Type2, and just need Type3.
+
+```js
+var opts = {
+  freeze: true
+}
+mRefresh(opts);
+
+$('#buttonAction').on('tap', function(){
+  mRefresh.resolve();
+});
+
+```
+
+Or 
+```js
+mRefresh();
+mRefresh.unbindEvents();
+
+$('#buttonAction').on('tap', function(){
+  mRefresh.resolve();
+});
+```
 
 ## Browser support
 

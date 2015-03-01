@@ -4,11 +4,13 @@
 
 > Mobile only
 
-Material Design swipe (pull) to refresh by using CSS3 and JavaScript.
+Material Design swipe (pull) to refresh.
 
 It uses CSS3 and JavaScript depend on [Zepto](https://github.com/madrobby/zepto) or [jQuery](https://github.com/jquery/jquery).
 
-Actually, it's easy to convert the dependent js library or just use the vanilla JavaScript.
+Actually, it's easy to convert the dependent js library 
+
+or just use the vanilla JavaScript.
 
 It's high performancenot which not impact the structure of sites.
 

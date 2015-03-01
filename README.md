@@ -1,12 +1,16 @@
 # Material Refresh
 
-> Material Design swipe (pull) to refresh
-
 > High Performance
 
 > Mobile only
 
-It's not impact the structure of sites.
+Material Design swipe (pull) to refresh by using CSS3 and JavaScript.
+
+It uses CSS3 and JavaScript depend on [Zepto](https://github.com/madrobby/zepto) or [jQuery](https://github.com/jquery/jquery).
+
+Actually, it's easy to convert the dependent js library or just use the vanilla JavaScript.
+
+It's high performancenot which not impact the structure of sites.
 
 ## Types and preview
 
@@ -46,7 +50,7 @@ Cause it is a plugin for `Zepto` or `jQuery`, so we also need to include `Zepto`
 <script src='jQuery.js'></script>
 ```
 
-Actually, we will combine and compress all the css or js, depend on your needs.
+Usually, we will combine and compress all the css or js, depend on your needs.
 
 You can also install it via [Bower](https://github.com/bower/bower) or [npm](https://www.npmjs.com/):
 
@@ -70,9 +74,9 @@ mRefresh.resolve();
 
 ## Relations of three types
 
-* Type1 and Type2 can not use in the same time.
-* Type3 is depend on Type1 or Type2, cause it will determine the refresher position 
-* Type3 and (Type1 or Type2) can use in the same time.
+* `Type1` and `Type2` can not use in the same time.
+* `Type3` is depend on `Type1` or `Type2`, cause it will determine the refresher position 
+* `Type3` and (`Type1` or `Type2`) can use in the same time.
 
 ## Advanced usage
 

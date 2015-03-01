@@ -6,7 +6,7 @@
 
 > Mobile only
 
-Not impact the structure of sites
+It's not impact the structure of sites.
 
 ## Types and preview
 
@@ -70,7 +70,80 @@ mRefresh.resolve();
 
 ## Advanced usage
 
+#### Options
+
+```js
+    // Default options 
+    /* var opts = { */
+    /*     nav: '', //String, using for Type2 */
+    /*     scrollEl: '', //String  */
+    /*     top: '0px', //String */
+    /*     theme: '', //String */
+    /*     index: 10001, //Number*/
+    /*     maxTime: 3000, //Number */
+    /*     freeze: false, //Boolen */
+    /*     onBegin: null, //Function */
+    /*     onEnd: null //Function */
+    /* } */
+    mRefresh(opts);
+```
+
+* nav: 
+
+-- Using for turn into Type2, refresh body will below the nav surface
+ 
+eg: 
+```js
+var opts = {
+  nav: '#navigation'
+}
+```
+
+* scrollEl: 
+
+-- custom scroll wrapper element, decide which elemnt will allow trigger refresh action.
+
+(Default:{ ios:document.body, android: document})
+
+eg: 
+```js
+var opts = {
+  scrollEl: '#mainWrapper'
+}
+```
+
+* onBegin: (Callback Function)
+
+-- Tigger when the refresh body start to rotate because of the right gesture(swipe). 
+
+-- You can use this callback to pull ajax data or other action.
+
+eg:
+```js
+var opts = {
+  onBegin: function(){
+    alert('Begin to rotate');
+    $.get('/whatevs.html', function(response){
+        $('#someDom').append(response);
+    });
+  }
+}
+
+
+* onEnd:
+
+* top:
+
+* theme:
+
+* index:
+
+* maxTime:
+
+* freeze:
+
 #### Type1: Above surface
+
 
 
 

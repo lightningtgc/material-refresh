@@ -82,6 +82,7 @@
     /*     theme: '', //String */
     /*     index: 10001, //Number*/
     /*     maxTime: 3000, //Number */
+    /*     freeze: false, //Boolen */
     /*     onBegin: null, //Function */
     /*     onEnd: null //Function */
     /* } */
@@ -156,7 +157,9 @@
         // Add Animation Class
         $refreshMain.addClass(mainAnimatClass);
 
-        bindEvents();
+        if(!options.freeze){
+            bindEvents();
+        }
     }
 
     // Finish loading
@@ -177,15 +180,16 @@
     }
 
     // Type3: Button action refresh
-    mRefresh.refresh = function(options) {
+    mRefresh.refresh = function(opt) {
         // Do rotate
         if(!isShowLoading){
             var realTargetPos = basePosY + NUM_POS_TARGET_Y - 20;
             isShowLoading = true;
             isBtnAction = true;
 
-            onBtnBegin = options.onBegin;
-            onBtnEnd = options.onEnd;
+            opt = opt || {};
+            onBtnBegin = opt.onBegin;
+            onBtnEnd = opt.onEnd;
 
             if (!isDefaultType()) {
                 realTargetPos = realTargetPos + NUM_NAV_TARGET_ADDY;
@@ -200,6 +204,15 @@
             
             setTimeout(doRotate, 60);
         }
+    }
+
+    // Unbind touch events,for freeze type1 and type2
+    mRefresh.unbindEvents = function(){
+        unbindEvents();
+    }
+
+    mRefresh.bindEvents = function(){
+        bindEvents();
     }
 
     // Render html template

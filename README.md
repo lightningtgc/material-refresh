@@ -251,7 +251,7 @@ Then the refresher will below the surface of the `navMain` element.
 If you had inited the refresher,you can bind the DOM event by using:
 ```js
 $('#buttonAction').on('tap', function(){
-  mRefresh.resolve();
+  mRefresh.refresh();
 });
 ```
 When you click the `buttonAction` element, the refresher will show.
@@ -260,7 +260,7 @@ If you want to get some callback when start or stop to refresh,by using `onBegin
 
 ```js
 $('#buttonAction').on('tap', function(){
-  var resolveOpts = {
+  var refreshOpts = {
     onBegin: function(){
       // Do something
       $.get('/whatevs.html', function(response){
@@ -271,7 +271,7 @@ $('#buttonAction').on('tap', function(){
       alert('Finish!')
     }
   }
-  mRefresh.resolve();
+  mRefresh.refresh(refreshOpts);
 });
 
 ```
@@ -285,7 +285,7 @@ var opts = {
 mRefresh(opts);
 
 $('#buttonAction').on('tap', function(){
-  mRefresh.resolve();
+  mRefresh.refresh();
 });
 
 ```
@@ -296,7 +296,7 @@ mRefresh();
 mRefresh.unbindEvents();
 
 $('#buttonAction').on('tap', function(){
-  mRefresh.resolve();
+  mRefresh.refresh();
 });
 ```
 

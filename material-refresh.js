@@ -16,6 +16,7 @@
 
     var noShowClass = 'mui-refresh-noshow';
     var mainAnimatClass = 'mui-refresh-main-animat';
+    var blueThemeClass = 'mui-blue-theme';
 
     var isShowLoading = false;
     var isStoping = false;
@@ -35,7 +36,9 @@
     var basePosY = 60;
 
     var onBegin = null;
+    var onBtnBegin= null;
     var onEnd = null;
+    var onBtnEnd = null;
     var stopAnimatTimeout = null;
     
     var refreshNav = '';
@@ -44,7 +47,7 @@
 
     var isIOS = $.os.ios;
 
-    var tmpl = '<div id="muiRefresh" class="mui-refresh-main mui-refresh-main-animat mui-blue-theme" >\
+    var tmpl = '<div id="muiRefresh" class="mui-refresh-main">\
         <div class="mui-refresh-wrapper ">\
             <div class="mui-arrow-wrapper">\
                 <div class="mui-arrow-main"></div>\
@@ -73,25 +76,20 @@
 
     // Default options 
     /* var opts = { */
-    /*     scrollEl: null, //String  */
+    /*     scrollEl: '', //String  */
+    /*     nav: '', //String */
+    /*     top: '0px', //String */
+    /*     theme: '', //String */
+    /*     index: 10001, //Number*/
     /*     maxTime: 3000, //Number */
     /*     onBegin: null, //Function */
-    /*     onEnd: null, //Function */
-    /*     nav: null, //String */
-    /*     index: 10001, //Number*/
-    /*     top: '0px' //String */
+    /*     onEnd: null //Function */
     /* } */
 
     
     /* Known issue: 
-     * 1.iOS feature when scrolling ,animation will stop  
+     * 1. iOS feature when scrolling ,animation will stop  
      * 2. Animation display issue in anfroid like miui小米
-     */
-
-    /**
-     * TODO list:
-     * * theme extract
-     *
      */
 
     // Main function to init the refresh style
@@ -110,12 +108,12 @@
 
         if ($('#muirefresh').length === 0) {
             renderTmpl();
-
-            $refreshMain = $('#muiRefresh');
-            $spinnerWrapper = $('.mui-spinner-wrapper', $refreshMain);
-            $arrowWrapper = $('.mui-arrow-wrapper', $refreshMain);
-            $arrowMain = $('.mui-arrow-main', $refreshMain);
         }
+
+        $refreshMain = $('#muiRefresh');
+        $spinnerWrapper = $('.mui-spinner-wrapper', $refreshMain);
+        $arrowWrapper = $('.mui-arrow-wrapper', $refreshMain);
+        $arrowMain = $('.mui-arrow-main', $refreshMain);
 
         // Custom nav bar 
         if (!isDefaultType()) {
@@ -143,6 +141,16 @@
             $refreshMain.css('top', options.top);
         }
 
+        // Extract theme 
+        if (options.theme) {
+            $refreshMain.addClass(options.theme);
+        } else {
+            $refreshMain.addClass(blueThemeClass);
+        }
+
+        // Add Animation Class
+        $refreshMain.addClass(mainAnimatClass);
+
         bindEvents();
     }
 
@@ -163,13 +171,16 @@
 
     }
 
-    // Button action refresh
-    mRefresh.refresh = function() {
+    // Type3: Button action refresh
+    mRefresh.refresh = function(options) {
         // Do rotate
         if(!isShowLoading){
             var realTargetPos = basePosY + NUM_POS_TARGET_Y - 20;
             isShowLoading = true;
             isBtnAction = true;
+
+            onBtnBegin = options.onBegin;
+            onBtnEnd = options.onEnd;
 
             if (!isDefaultType()) {
                 realTargetPos = realTargetPos + NUM_NAV_TARGET_ADDY;
@@ -268,6 +279,10 @@
         }
     }
     
+    /**
+     * backToStart
+     * Return to start position
+     */
     function backToStart() {
         var realStartPos = basePosY + NUM_POS_START_Y;
         if ( isDefaultType() ) {
@@ -293,7 +308,6 @@
      *
      * @param {number} y
      */
-
     function moveCircle(y){
         var scaleRate = 40;
         var scalePer = y / scaleRate > 1 ? 1 : y / scaleRate < 0 ? 0 : y / scaleRate;
@@ -321,8 +335,11 @@
      */
     function doRotate(){
         isShowLoading = true;
-        // Do onBegin callback
-        if (typeof onBegin === 'function') {
+        // Do button action callback
+        if (isBtnAction && typeof onBtnBegin === 'function') {
+            onBtnBegin();
+        } else if (typeof onBegin === 'function') {
+            // Do onBegin callback
             onBegin();
         }
 
@@ -375,13 +392,16 @@
 
             isShowLoading = false;
             isStoping = false;
-            isBtnAction = false;
 
-            if (typeof onEnd === 'function') {
+            if (isBtnAction && typeof onBtnEnd === 'function') {
+                onBtnEnd();
+            } else if (typeof onEnd === 'function') {
                 onEnd();
             }
-
-        }, 500); 
+            
+            isBtnAction = false;
+            
+        }, 500);
     }
 
     /**

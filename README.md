@@ -29,23 +29,24 @@ It's high performancenot which not impact the structure of sites.
 
 ## Demo
 
-[The Live Demo](http://lightningtgc.github.io/material-refresh/)
+#### [The Live Demo](http://lightningtgc.github.io/material-refresh/)
 
 ## Getting Started
 
 #### Install it
 
-Include `material-refresh.js` and `material-refresh.css` in your target html file.
+Include `material-refresh.min.js` and `material-refresh.min.css` in your target html file.
 
 ```html
-<link rel='stylesheet' href='material-refresh.css'/>
+<link rel='stylesheet' href='material-refresh.min.css'/>
 
-<script src='material-refresh.js'></script>
+<script src='material-refresh.min.js'></script>
 ```
 
 Cause it is a plugin for `Zepto` or `jQuery`, so we also need to include `Zepto` or `jQuery`:
 ```html
 <script src='zepto.js'></script>
+
 <!-- or include jQuery.js-->
 <script src='jQuery.js'></script>
 ```
@@ -54,7 +55,7 @@ Usually, we will combine and compress all the css or js, depend on your needs.
 
 You can also install it via [Bower](https://github.com/bower/bower) or [npm](https://www.npmjs.com/):
 
-Coming...
+Coming soon...
 
 ## Basic usage
 

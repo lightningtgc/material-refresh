@@ -32,7 +32,7 @@
     var touchStartY = 0;
     var customNavTop = 0;
     var verticalThreshold = 2;
-    var maxRotateTime = 3000;
+    var maxRotateTime = 6000; //Max time to stop rotate
     var basePosY = 60;
 
     var onBegin = null;
@@ -127,8 +127,11 @@
             basePosY = $(refreshNav).height() + 20;
             if($(refreshNav).offset()){
                 customNavTop = $(refreshNav).offset().top;
-                basePosY += customNavTop;
-                // Set init Y position
+                // Handle position fix
+                if($(refreshNav).css('position') !== 'fixed'){
+                    basePosY += customNavTop;
+                }
+                // Set the first Y position
                 $refreshMain.css('top', customNavTop + 'px');
             }
 
@@ -161,6 +164,8 @@
             bindEvents();
         }
     }
+
+    // Public Methods
 
     // Finish loading
     mRefresh.resolve = function() {
@@ -195,6 +200,8 @@
                 realTargetPos = realTargetPos + NUM_NAV_TARGET_ADDY;
             }
             
+            // Handle freeze
+            $refreshMain.show();
             //Romove animat time
             $refreshMain.removeClass(mainAnimatClass);
             // move to target position

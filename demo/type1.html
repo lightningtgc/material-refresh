@@ -7,25 +7,33 @@
     <title>Material Design swipe to refresh</title>
     <link rel="stylesheet" href="../dev/css/material-refresh.css" />
     <link rel="stylesheet" href="styles/css/demo.css" />
+    <style type="text/css">
+        .contents {
+            top:0;
+        }
+        #forkongithub {
+            display:none;
+        }
+    </style>
 </head>
 <body>
-    <header id="navMain" class="nav-bar">
-        <div class="nav-wrapper">
-            <span class="title">Material Refresh</span>
-            <span id="doRotate" class="rotate-btn"></span>
-        </div>
-    </header>
-
-    <span id="forkongithub"><a target="_blank" href="https://github.com/lightningtgc/material-refresh">Fork me on GitHub</a></span>
+    <div id="forkongithub"><a target="_blank" href="https://github.com/lightningtgc/material-refresh">Fork me on GitHub</a></div>
 
     <div class='contents'>
       <div class='demo-block intro'>
-          <h2>Intro <iframe src="http://ghbtns.com/github-btn.html?user=lightningtgc&repo=material-refresh&type=watch&count=true"
+          <h2> Type1 Demo<iframe src="http://ghbtns.com/github-btn.html?user=lightningtgc&repo=material-refresh&type=watch&count=true"
           allowtransparency="true" frameborder="0" scrolling="0" width="100" height="20"></iframe></h2>
           <h3> Google Material Design swipe (pull) to refresh.  </h3> 
-          <p> It uses CSS3 and JavaScript depend on <a href="https://github.com/madrobby/zepto" target="_blank">Zepto</a> or <a href="https://github.com/jquery/jquery" target="_blank">jQuery</a>. </p>
-          <p> Mobile Only and High Performance.  </p>
-          <p> You can use 3 types of this Material Design refresher.  </p>
+          <p> Open this site in mobile browser or webview, then use your finger to pull down the page.</p>
+          <p> You can also click some button ↓↓ to refresh the page. </p>
+          <div id="doTheRotate" class="rotate-btn-wrapper">
+            Click me! 
+            </div>
+            <p>
+                <a href="http://lightningtgc.github.io/material-refresh/index.html">Maybe you can try the Type2:Below surface</a>
+            </p>
+
+          <p> Three types of this Material Design refresher.  </p>
     </div>
     <div class='demo-block'>
         <h3>Type1: Above surface (default)</h3>
@@ -37,10 +45,17 @@
                 mRefresh();
             </div>
         </p>
-        <h4> You can try it in mobile browser or webview by scanning the following QR code: </h4>
+
+        <h4> You can try it in chrome device mode or other mobile emulator. </h4>
+        <h4> Similarly, try it in mobile browser or webview by scanning the following QR code: </h4>
 
         <img src="styles/images/qr-above.png" alt="QR" style="display: block;margin:0 auto;width: 300px;
         height: 300px;"/>
+
+        <p>
+        <a href="http://lightningtgc.github.io/material-refresh/type1.html">URL: http://lightningtgc.github.io/material-refresh/type1.html</a>
+        </p>
+        
     </div>
     <div class="demo-block">
         <h3>Type2: Below surface</h3>
@@ -56,14 +71,13 @@
             });
         </div>
 
-        <h4> Actually, this page is the demo for Type2. </h4>
-        <h4> You can try it in chrome device mode or other mobile emulator. </h4>
-
-        <h4> Similarly, try it in mobile browser or webview by scanning the following QR code: </h4>
+        <h4> Try it in mobile browser or webview by scanning the following QR code: </h4>
 
         <img src="styles/images/qr-below.png" alt="QR" style="display: block;margin:0 auto;width: 300px;
         height: 300px;"/>
-
+        <p>
+        <a href="http://lightningtgc.github.io/material-refresh/index.html">URL: http://lightningtgc.github.io/material-refresh/index.html</a>
+        </p>
     </div>
     <div class="demo-block">
         <h3>Type3: Button action</h3>
@@ -96,12 +110,10 @@
     <script type="text/javascript" src="../material-refresh.js"></script>
     <script type="text/javascript">
         ;(function(){
-            // Init Type2
-            mRefresh({
-                nav: '#navMain'      
-            });
+            // Init Type1
+            mRefresh();
             // Button on the top of page
-            $('#doRotate').on('click',function(){
+            $('#doTheRotate').on('click',function(){
                 mRefresh.refresh();   
             });
 

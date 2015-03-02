@@ -232,7 +232,7 @@
         if(isIOS && scrollEl == document.body){
             touchPos.top = window.scrollY;
         }else{
-            touchPos.top = document.body.scrollTop;
+            touchPos.top = (document.documentElement || document.body.parentNode || document.body).scrollTop;
         }
 
         if (touchPos.top > 0 || isShowLoading) {

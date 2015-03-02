@@ -22,7 +22,7 @@ a {
     padding-left: 20px;
     color: #00BCD4;
 }
-.intro a {
+a.no-border {
     border:none;
     padding-left: 0;
 }
@@ -83,10 +83,14 @@ a {
 }
 .rotate-btn-wrapper {
     background-color: #02BBD3;
+    color: white;
+    text-align:center;
     height: 40px;
     width: 90px;
+    line-height:40px;
     border-radius: 10px;
     cursor:pointer;
+    font-size: 1.6rem;
 }
 .demo-rotate-btn {
     position:relative;
@@ -219,8 +223,8 @@ a {
 }
 @media screen and (min-width:800px){
     #forkongithub{
-        position:absolute;
-        display:block;
+        position:fixed;
+        display:block !important;
         top:0;
         right:0;
         width:200px;

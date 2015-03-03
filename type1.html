@@ -8,8 +8,12 @@
     <link rel="stylesheet" href="material-refresh.min.css" />
     <link rel="stylesheet" href="styles/css/demo.css" />
     <style type="text/css">
-        .contents {
+        .contents-main {
+            position: relative;
             top:0;
+            left: 0;    
+            margin: 0 auto;
+            max-width: 800px;
         }
         #forkongithub {
             display:none;
@@ -19,7 +23,7 @@
 <body>
     <div id="forkongithub"><a target="_blank" href="https://github.com/lightningtgc/material-refresh">Fork me on GitHub</a></div>
 
-    <div class='contents'>
+    <div class='contents-main'>
       <div class='demo-block intro'>
           <h2> Type1 Demo<iframe src="http://ghbtns.com/github-btn.html?user=lightningtgc&repo=material-refresh&type=watch&count=true"
           allowtransparency="true" frameborder="0" scrolling="0" width="100" height="20"></iframe></h2>
@@ -49,8 +53,7 @@
         <h4> You can try it in chrome device mode or other mobile emulator. </h4>
         <h4> Similarly, try it in mobile browser or webview by scanning the following QR code: </h4>
 
-        <img src="styles/images/qr-above.png" alt="QR" style="display: block;margin:0 auto;width: 300px;
-        height: 300px;"/>
+        <img src="styles/images/qr-above.png" alt="QR" class="qr-img"/>
 
         <p>
         <a href="http://lightningtgc.github.io/material-refresh/type1.html">URL: http://lightningtgc.github.io/material-refresh/type1.html</a>
@@ -59,7 +62,6 @@
     </div>
     <div class="demo-block">
         <h3>Type2: Below surface</h3>
-        <img src="styles/images/below.gif" alt="Below surface" class="half-img"/>
         <img src="styles/images/below-color.gif" alt="Below surface" class="half-img"/>
 
         <p>Source code:</p>
@@ -73,8 +75,7 @@
 
         <h4> Try it in mobile browser or webview by scanning the following QR code: </h4>
 
-        <img src="styles/images/qr-below.png" alt="QR" style="display: block;margin:0 auto;width: 300px;
-        height: 300px;"/>
+        <img src="styles/images/qr-below.png" alt="QR" class="qr-img"/>
         <p>
         <a href="http://lightningtgc.github.io/material-refresh/index.html">URL: http://lightningtgc.github.io/material-refresh/index.html</a>
         </p>
@@ -107,23 +108,26 @@
     </div>
    
     <script type="text/javascript" src="libs/zepto.min.js"></script>
-    <script type="text/javascript" src="material-refresh.min.js"></script>
+    <script type="text/javascript" src="material-refresh.js"></script>
     <script type="text/javascript">
         ;(function(){
             // Init Type1
             mRefresh();
+
             // Button on the top of page
-            $('#doTheRotate').on('click',function(){
-                mRefresh.refresh();   
+            $('#doTheRotate').on('tap click',function(){
+                mRefresh.refresh(); 
+                return false;  
             });
 
             // Content demo button
-            $('#buttonAction').on('click', function(){
+            $('#buttonAction').on('tap click', function(){
                 mRefresh.refresh({
                     onBegin: function(){
                         alert('It begin to rotate! You can do something like pull ajax data!');
                     }    
                 });
+                return false;
             });   
         })();
     </script>

@@ -1,0 +1,38 @@
+﻿{
+  "name": "material-refresh",
+  "version": "0.1.0",
+  "main": [
+    "material-refresh.min.js",
+    "material-refresh.min.css"
+  ],
+  "scripts": [
+    "build/js/material-refresh.js"
+  ],
+  "styles": [
+    "build/css/material-refresh.css"
+  ],
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "Material",
+    "Design",
+    "pull",
+    "to",
+    "refresh",
+    "CSS3"
+  ],
+  "authors": [
+    "gctang <lightningtgc@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "http://lightningtgc.github.io/material-refresh/",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
+

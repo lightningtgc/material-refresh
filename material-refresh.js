@@ -231,7 +231,9 @@
     function touchStart(e){
         if(isIOS && scrollEl == document.body){
             touchPos.top = window.scrollY;
-        }else{
+        }else if(scrollEl != document){
+            touchPos.top = document.querySelector(scrollEl).scrollTop;
+        } else {
             touchPos.top = (document.documentElement || document.body.parentNode || document.body).scrollTop;
         }
 

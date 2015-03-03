@@ -55,7 +55,12 @@ Usually, we will combine and compress all the css or js, depend on your needs.
 
 You can also install it via [Bower](https://github.com/bower/bower) or [npm](https://www.npmjs.com/):
 
-Coming soon...
+```
+bower install --save material-refresh
+```
+```
+npm install --save material-refresh
+```
 
 ## Basic usage
 

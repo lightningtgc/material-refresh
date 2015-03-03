@@ -5,20 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <meta name="format-detection" content="telephone=no"> 
     <title>Material Design swipe to refresh</title>
-    <link rel="stylesheet" href="../material-refresh.css" />
+    <link rel="stylesheet" href="../material-refresh.min.css" />
     <link rel="stylesheet" href="styles/css/demo.css" />
 </head>
 <body>
     <header id="navMain" class="nav-bar">
         <div class="nav-wrapper">
             <span class="title">Material Refresh</span>
-            <span id="doRotate" class="rotate-btn"></span>
+            <span id="doRotate">
+                <span  class="rotate-btn"></span>
+            </span>
         </div>
     </header>
 
-    <span id="forkongithub"><a target="_blank" href="https://github.com/lightningtgc/material-refresh">Fork me on GitHub</a></span>
-
-    <div class='contents'>
+    <div id="contentMain" class='contents'>
+        <span id="forkongithub"><a target="_blank" href="https://github.com/lightningtgc/material-refresh">Fork me on GitHub</a></span>
       <div class='demo-block intro'>
           <h2>Intro <iframe src="http://ghbtns.com/github-btn.html?user=lightningtgc&repo=material-refresh&type=watch&count=true"
           allowtransparency="true" frameborder="0" scrolling="0" width="100" height="20"></iframe></h2>
@@ -39,15 +40,13 @@
         </p>
         <h4> You can try it in mobile browser or webview by scanning the following QR code: </h4>
 
-        <img src="styles/images/qr-above.png" alt="QR" style="display: block;margin:0 auto;width: 300px;
-        height: 300px;"/>
+        <img src="styles/images/qr-above.png" alt="QR" class="qr-img"/>
         <p>
         <a href="http://lightningtgc.github.io/material-refresh/type1.html">URL: http://lightningtgc.github.io/material-refresh/type1.html</a>
         </p>
     </div>
     <div class="demo-block">
         <h3>Type2: Below surface</h3>
-        <img src="styles/images/below.gif" alt="Below surface" class="half-img"/>
         <img src="styles/images/below-color.gif" alt="Below surface" class="half-img"/>
 
         <p>Source code:</p>
@@ -64,8 +63,7 @@
 
         <h4> Similarly, try it in mobile browser or webview by scanning the following QR code: </h4>
 
-        <img src="styles/images/qr-below.png" alt="QR" style="display: block;margin:0 auto;width: 300px;
-        height: 300px;"/>
+        <img src="styles/images/qr-below.png" alt="QR" class="qr-img"/>
         <p>
         <a href="http://lightningtgc.github.io/material-refresh/index.html">URL: http://lightningtgc.github.io/material-refresh/index.html</a>
         </p>
@@ -99,26 +97,49 @@
     </div>
    
     <script type="text/javascript" src="libs/zepto.min.js"></script>
-    <script type="text/javascript" src="../material-refresh.js"></script>
+    <script type="text/javascript" src="../material-refresh.min.js"></script>
     <script type="text/javascript">
         ;(function(){
-            // Init Type2
+            // Init Type2 
             mRefresh({
-                nav: '#navMain'      
-            });
+                nav: '#navMain',
+                scrollEl: '#contentMain'
+            })
             // Button on the top of page
-            $('#doRotate').on('click',function(){
+            $('#doRotate').on('tap click',function(){
                 mRefresh.refresh();   
+                return false;
             });
 
             // Content demo button
-            $('#buttonAction').on('click', function(){
+            $('#buttonAction').on('tap click', function(){
                 mRefresh.refresh({
                     onBegin: function(){
                         alert('It begin to rotate! You can do something like pull ajax data!');
                     }    
-                });
+                    });
+                return false;
             });   
+
+
+
+            // prevent browser scroll
+            $('#navMain').on('touchstart', function(e){
+                 e.preventDefault();
+            });
+	        // Handle the start of interactions
+            $('#contentMain').on('touchmove', function(e){
+                var el = document.getElementById("contentMain");
+                var startTopScroll = el.scrollTop;
+
+                if (startTopScroll <= 0) {
+                    el.scrollTop = 1;
+                }
+                if(startTopScroll + el.offsetHeight >= el.scrollHeight) {
+                    el.scrollTop = el.scrollHeight - el.offsetHeight - 1;
+                }
+            });
+
         })();
     </script>
 </body>

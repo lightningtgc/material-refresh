@@ -1,9 +1,10 @@
 ﻿{
   "name": "material-refresh",
-  "description": "Material design pull to refresh, mobile only",
+  "description": "Material Design pull to refresh, by using CSS3 and
+  JavaScript",
   "version": "0.1.0",
   "homepage": "https://github.com/lightningtgc/material-refresh",
-  "author": "tang guichuan <tangguichuan@gmail.com>",
+  "author": "gctang <lightningtgc@gmail.com>",
   "repository": {
     "type": "git",
     "url": "git://github.com/lightningtgc/material-refresh.git"

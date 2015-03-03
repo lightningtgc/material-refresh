@@ -1,5 +1,7 @@
 # Material Refresh
 
+[![Join the chat at https://gitter.im/lightningtgc/material-refresh](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/lightningtgc/material-refresh?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 > High Performance
 
 > Mobile only

@@ -78,7 +78,7 @@ mRefresh();
 mRefresh.resolve();
 ```
 
-If you don't use this method, refesn will stop after the maxTime(Default: 6000ms).
+If you don't use this method, refesher will stop after the maxTime(Default: 6000ms).
 
 ## Relations of three types
 

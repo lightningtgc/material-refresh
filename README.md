@@ -92,17 +92,17 @@ If you don't use this method, refesher will stop after the maxTime(Default: 6000
 
 ```js
     // Default options 
-    /* var opts = { */
-    /*     nav: '', //String, using for Type2 */
-    /*     scrollEl: '', //String  */
-    /*     top: '0px', //String */
-    /*     theme: '', //String */
-    /*     index: 10001, //Number*/
-    /*     maxTime: 3000, //Number */
-    /*     freeze: false, //Boolen */
-    /*     onBegin: null, //Function */
-    /*     onEnd: null //Function */
-    /* } */
+     var opts = { 
+         nav: '', //String, using for Type2 
+         scrollEl: '', //String  
+         onBegin: null, //Function 
+         onEnd: null, //Function 
+         top: '0px', //String 
+         theme: 'mui-blue-theme', //String 
+         index: 10001, //Number
+         maxTime: 6000, //Number 
+         freeze: false //Boolen 
+     } 
     mRefresh(opts);
 ```
 

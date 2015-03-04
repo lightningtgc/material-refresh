@@ -78,6 +78,8 @@ mRefresh();
 mRefresh.resolve();
 ```
 
+If you don't use this method, refesn will stop after the maxTime(Default: 6000ms).
+
 ## Relations of three types
 
 * `Type1` and `Type2` can not use in the same time.
@@ -164,18 +166,6 @@ var opts = {
 }
 ```
 
-##### index:
-
--- Set `z-index` of the refresher to change it in z-space.
-
--- Default { `Type1`: 10001,  `Type2`: (the z-index of nav element) - 1}
-
-```js
-var opts = {
-  index: 99
-}
-```
-
 ##### theme: (Default: 'mui-blue-theme')
 
 -- Set color or custom style of the refresher. 
@@ -188,9 +178,21 @@ var opts = {
 }
 ```
 
+##### index:
+
+-- Set `z-index` of the refresher to change it in z-space.
+
+-- Default { `Type1`: 10001,  `Type2`: (the z-index of nav element) - 1}
+
+```js
+var opts = {
+  index: 99
+}
+```
+
 ##### maxTime: (Default: 6000ms)
 
--- Refresher will stop in the maxTime if you don't use `mRefresh.resolve()` to stop it.
+-- Refresher will stop after the maxTime if you don't use `mRefresh.resolve()` to stop it.
 
 -- You can change this maxTime  to make it longer or shorter.
 

@@ -281,7 +281,6 @@ $('#buttonAction').on('tap', function(){
   }
   mRefresh.refresh(refreshOpts);
 });
-
 ```
 
 If you want not to trigger `Type1` or `Type2`, and just need `Type3`.
@@ -295,7 +294,6 @@ mRefresh(opts);
 $('#buttonAction').on('tap', function(){
   mRefresh.refresh();
 });
-
 ```
 
 Or 

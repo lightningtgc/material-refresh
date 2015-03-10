@@ -144,7 +144,7 @@ var opts = {
     });
   }
 }
-
+```
 
 ##### onEnd: (Callback Function)
 

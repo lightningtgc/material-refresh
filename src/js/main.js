@@ -1,17 +1,16 @@
 /**
- * Google Material Design Swipe To Refresh.   
+ * Google Material Design Swipe To Refresh.
  * By Gctang(https://github.com/lightningtgc)
  *
  * Three types of refresh:
  * 1. Above or coplanar with another surface
- * 2. Below another surface in z-space. 
+ * 2. Below another surface in z-space.
  * 3. Button action refresh
  *
  */
 
-;(function($){
-    var $scrollEl = $(document.body);
-    var $refreshMain, $spinnerWrapper, $arrowWrapper, $arrowMain;
+;(function() {
+    var refreshMain, spinnerWrapper, arrowWrapper, arrowMain;
     var scrollEl = document.body;
 
     var noShowClass = 'mui-refresh-noshow';
@@ -40,12 +39,12 @@
     var onEnd = null;
     var onBtnEnd = null;
     var stopAnimatTimeout = null;
-    
+
     var refreshNav = '';
 
     var lastTime = new Date().getTime();
 
-    var isIOS = $.os.ios;
+    var isIOS = /ip(hone|ad|od)/i.test(navigator.userAgent);
 
     var tmpl = '<div id="muiRefresh" class="mui-refresh-main">\
         <div class="mui-refresh-wrapper ">\
@@ -74,7 +73,7 @@
         y2: 0
     }
 
-    // Default options 
+    // Default options
     /* var opts = { */
     /*     scrollEl: '', //String  */
     /*     nav: '', //String */
@@ -87,16 +86,22 @@
     /*     onEnd: null //Function */
     /* } */
 
-    
-    /* Known issue: 
-     * 1. iOS feature when scrolling ,animation will stop  
+
+    /* Known issue:
+     * 1. iOS feature when scrolling ,animation will stop
      * 2. Animation display issue in anfroid like miui小米
      *
      *
      * TODO list:
-     * 1. Using translate and scale together to replace top 
+     * 1. Using translate and scale together to replace top
      * 2. Optimize circle rotate animation
      */
+
+    function parseIntPx(v) {
+      var m = v.match('(\d+)px');
+      if (m == null) return 0;
+      return parseInt(m[1], 10);
+    }
 
     // Main function to init the refresh style
     function mRefresh(options) {
@@ -104,7 +109,6 @@
 
         scrollEl = options.scrollEl ? options.scrollEl :
                         isIOS ? scrollEl : document;
-        $scrollEl = $(scrollEl);
 
         // extend options
         onBegin = options.onBegin;
@@ -112,53 +116,57 @@
         maxRotateTime = options.maxTime || maxRotateTime;
         refreshNav = options.nav || refreshNav;
 
-        if ($('#muirefresh').length === 0) {
+        if (document.querySelectorAll('#muirefresh').length === 0) {
             renderTmpl();
         }
 
-        $refreshMain = $('#muiRefresh');
-        $spinnerWrapper = $('.mui-spinner-wrapper', $refreshMain);
-        $arrowWrapper = $('.mui-arrow-wrapper', $refreshMain);
-        $arrowMain = $('.mui-arrow-main', $refreshMain);
+        refreshMain = document.querySelector('#muiRefresh');
+        spinnerWrapper = refreshMain.querySelector('.mui-spinner-wrapper');
+        arrowWrapper = refreshMain.querySelector('.mui-arrow-wrapper');
+        arrowMain = refreshMain.querySelector('.mui-arrow-main');
 
-        // Custom nav bar 
+        // Custom nav bar
         if (!isDefaultType()) {
-            $refreshMain.addClass('mui-refresh-nav');
-            basePosY = $(refreshNav).height() + 20;
-            if($(refreshNav).offset()){
-                customNavTop = $(refreshNav).offset().top;
+            refreshMain.classList.add('mui-refresh-nav');
+            basePosY = parseIntPx(refreshNav.style.height) + 20;
+            var rect;
+            if(rect = refreshNav.getBoundingClientRect()){
+                var top  = rect.top + document.body.scrollTop,
+                    left = rect.left + document.body.scrollLeft;
+
+                customNavTop = top;
                 // Handle position fix
-                if($(refreshNav).css('position') !== 'fixed'){
+                if(refreshNav.style.position !== 'fixed'){
                     basePosY += customNavTop;
                 }
                 // Set the first Y position
-                $refreshMain.css('top', customNavTop + 'px');
+                refreshMain.style.top = customNavTop + 'px';
             }
 
             //Set z-index to make sure ablow the nav bar
-            var navIndex = $(refreshNav).css('z-index');
-            $refreshMain.css('z-index', navIndex - 1);
+            var navIndex = refreshNav.style.zIndex;
+            refreshMain.style.zIndex = navIndex - 1;
         }
 
         //Set custom z-index
         if(options.index){
-            $refreshMain.css('z-index', ~~options.index);
+            refreshMain.style.zIndex = ~~options.index;
         }
 
         //Set custom top, to change the position
         if(options.top){
-            $refreshMain.css('top', options.top);
+            refreshMain.style.top = options.top;
         }
 
-        // Extract theme 
+        // Extract theme
         if (options.theme) {
-            $refreshMain.addClass(options.theme);
+            refreshMain.classList.add(options.theme);
         } else {
-            $refreshMain.addClass(blueThemeClass);
+            refreshMain.classList.add(blueThemeClass);
         }
 
         // Add Animation Class
-        $refreshMain.addClass(mainAnimatClass);
+        refreshMain.classList.add(mainAnimatClass);
 
         if(!options.freeze){
             bindEvents();
@@ -180,7 +188,7 @@
     // Destory refresh
     mRefresh.destroy = function(){
         unbindEvents();
-        $refreshMain.remove();
+        refreshMain.parentNode.removeChild(refreshMain);
 
     }
 
@@ -199,16 +207,16 @@
             if (!isDefaultType()) {
                 realTargetPos = realTargetPos + NUM_NAV_TARGET_ADDY;
             }
-            
+
             // Handle freeze
-            $refreshMain.show();
+            refreshMain.style.display = '';
             //Romove animat time
-            $refreshMain.removeClass(mainAnimatClass);
+            refreshMain.classList.remove(mainAnimatClass);
             // move to target position
-            $refreshMain.css('top', realTargetPos + 'px');
+            refreshMain.style.top = realTargetPos + 'px';
             // make it small
-            $refreshMain.css('-webkit-transform', 'scale(' + 0.01  + ')');
-            
+            refreshMain.style.webkitTransform = 'scale(' + 0.01 + ')';
+
             setTimeout(doRotate, 60);
         }
     }
@@ -242,8 +250,8 @@
         }
 
         touchCurrentY = basePosY + NUM_POS_START_Y;
-        $refreshMain.show();
-        
+        refreshMain.style.display = '';
+
         if (e.touches[0]) {
             touchPos.x1 = e.touches[0].pageX;
             touchStartY = touchPos.y1 = e.touches[0].pageY;
@@ -268,10 +276,10 @@
         distanceY = touchPos.y2 - touchPos.y1;
 
         if (touchPos.y2 - touchStartY + verticalThreshold > 0) {
-            e.preventDefault();  
+            e.preventDefault();
 
             // Some android phone
-            // Throttle, aviod jitter 
+            // Throttle, aviod jitter
             if (now - lastTime < 90) {
                 return;
             }
@@ -297,7 +305,7 @@
             return;
         }
         e.preventDefault();
-        
+
         if (touchCurrentY > basePosY - customNavTop + NUM_POS_MIN_Y) {
             // Should move over the min position
             doRotate();
@@ -305,7 +313,7 @@
             backToStart();
         }
     }
-    
+
     /**
      * backToStart
      * Return to start position
@@ -313,18 +321,18 @@
     function backToStart() {
         var realStartPos = basePosY + NUM_POS_START_Y;
         if ( isDefaultType() ) {
-            $refreshMain.css('top', realStartPos + 'px');
-            $refreshMain.css('-webkit-transform', 'scale(' + 0  + ')');
+            refreshMain.style.top = realStartPos + 'px';
+            refreshMain.style.webkitTransform = 'scale(' + 0  + ')';
         } else {
             // Distance must greater than NUM_POS_MIN_Y
-            $refreshMain.css('top', customNavTop + 'px');
-            /* $refreshMain.css('-webkit-transform', 'translateY(' + realStartPos + 'px)'); */
+            refreshMain.style.top = customNavTop + 'px';
+            /* refreshMain.style.webkitTransform = 'translateY(' + realStartPos + 'px)'; */
         }
         setTimeout(function(){
             // Handle button action
             if(!isShowLoading){
-                $refreshMain.css('opacity', 0);
-                $refreshMain.hide();
+                refreshMain.style.opacity = 0;
+                refreshMain.style.display = 'none';
             }
         }, 300);
     }
@@ -342,15 +350,15 @@
 
         if (isDefaultType()) {
             // Small to Big
-            $refreshMain.css('-webkit-transform', 'scale(' + scalePer  + ')');
+            refreshMain.style.webkitTransform = 'scale(' + scalePer  + ')';
         }
-        /* $refreshMain.css('-webkit-transform', 'translateY('+ y + 'px)'); */
+        /* refreshMain.style.webkitTransform = 'translateY('+ y + 'px)'; */
 
-        $refreshMain.css('opacity', scalePer);
+        refreshMain.style.opacity = scalePer;
         // Change the position
-        $refreshMain.css('top', currMoveY + 'px');
-        $arrowMain.css('-webkit-transform', 'rotate(' + -(y * 3) + 'deg)');
-        /* $arrowMain.css('transform', 'rotate(' + -(y * 3) + 'deg)'); */ 
+        refreshMain.style.top = currMoveY + 'px';
+        arrowMain.style.webkitTransform = 'rotate(' + -(y * 3) + 'deg)';
+        /* arrowMain.style.transform = 'rotate(' + -(y * 3) + 'deg)'; */
 
     }
 
@@ -371,24 +379,24 @@
         }
 
         // Make sure display entirely
-        $refreshMain.css('opacity', 1);
+        refreshMain.style.opacity = 1;
 
-        if (!isBtnAction) { 
+        if (!isBtnAction) {
             var realTargetPos = basePosY + NUM_POS_TARGET_Y - 20;
             if (!isDefaultType()) {
                 realTargetPos = realTargetPos + NUM_NAV_TARGET_ADDY;
             }
-            $refreshMain.css('top', realTargetPos + 'px');
-            /* $refreshMain.css('-webkit-transform', 'translateY(' + realTargetPos + 'px)'); */
+            refreshMain.style.top = realTargetPos + 'px';
+            /* refreshMain.style.webkitTransform = 'translateY(' + realTargetPos + 'px)'; */
         } else {
-            $refreshMain.addClass(mainAnimatClass);
-            $refreshMain.css('-webkit-transform', 'scale(' + 1  + ')');
+            refreshMain.classList.add(mainAnimatClass);
+            refreshMain.style.webkitTransform = 'scale(' + 1  + ')';
         }
 
-        $arrowWrapper.hide();
+        arrowWrapper.style.display = 'none';
 
         // Start animation
-        $spinnerWrapper.show();
+        spinnerWrapper.style.display = '';
 
         // Timeout to stop animation
         stopAnimatTimeout = setTimeout(recoverRefresh, maxRotateTime);
@@ -396,24 +404,24 @@
 
     /**
      * Recover Refresh
-     * Hide the circle 
+     * Hide the circle
      */
     function recoverRefresh(){
         // For aviod resolve
         isStoping = true;
 
-        // Stop animation 
-        $refreshMain.addClass(noShowClass);
+        // Stop animation
+        refreshMain.classList.add(noShowClass);
 
-        $spinnerWrapper.hide();
+        spinnerWrapper.style.display = 'none';
 
         setTimeout(function(){
-            $refreshMain.removeClass(noShowClass);
-            $refreshMain.hide();
-            
+            refreshMain.classList.remove(noShowClass);
+            refreshMain.style.display = 'none';
+
             backToStart();
 
-            $arrowWrapper.show();
+            arrowWrapper.style.display = '';
 
             isShowLoading = false;
             isStoping = false;
@@ -423,9 +431,9 @@
             } else if (typeof onEnd === 'function') {
                 onEnd();
             }
-            
+
             isBtnAction = false;
-            
+
         }, 500);
     }
 
@@ -436,23 +444,22 @@
      * @return {Boolen}
      */
     function isDefaultType() {
-       return $(refreshNav).length === 0;
+       return !refreshNav.length || document.querySelectorAll(refreshNav).length === 0;
     }
 
     function bindEvents() {
-        $scrollEl.on('touchstart', touchStart);
-        $scrollEl.on('touchmove', touchMove);
-        $scrollEl.on('touchend', touchEnd);
+        scrollEl.addEventListener('touchstart', touchStart);
+        scrollEl.addEventListener('touchmove', touchMove);
+        scrollEl.addEventListener('touchend', touchEnd);
     }
 
     function unbindEvents() {
-        $scrollEl.off('touchstart', touchStart);
-        $scrollEl.off('touchmove', touchMove);
-        $scrollEl.off('touchend', touchEnd);
+        scrollEl.removeEventListener('touchstart', touchStart);
+        scrollEl.removeEventListener('touchmove', touchMove);
+        scrollEl.removeEventListener('touchend', touchEnd);
     }
 
 
     window.mRefresh = mRefresh;
 
-})(Zepto || jQuery);
-
+})();

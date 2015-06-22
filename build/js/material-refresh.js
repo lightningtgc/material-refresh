@@ -36,7 +36,7 @@
 
         var lastTime = new Date().getTime();
 
-        var isIOS = $.os.ios;
+        var isIOS = !!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
 
         var tmpl = '<div id="muiRefresh" class="mui-refresh-main">\
             <div class="mui-refresh-wrapper ">\
@@ -234,6 +234,9 @@
 
             touchCurrentY = basePosY + NUM_POS_START_Y;
             $refreshMain.show();
+
+            // Fix jQuery touch event detect
+            e = e.originalEvent || e;
             
             if (e.touches[0]) {
                 touchPos.x1 = e.touches[0].pageX;
@@ -244,6 +247,8 @@
         function touchMove(e){
             var thisTouch, distanceY;
             var now = new Date().getTime();
+
+            e = e.originalEvent || e;
 
             if (touchPos.top > 0 || isShowLoading || !e.touches || e.touches.length !== 1) {
                 // Just allow one finger
@@ -445,5 +450,5 @@
 
         window.mRefresh = mRefresh;
 
-    })(Zepto || jQuery);
+    })(window.Zepto || window.jQuery);
 }).call(this);

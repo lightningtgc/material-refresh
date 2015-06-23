@@ -244,22 +244,27 @@
         touchCurrentY = basePosY + NUM_POS_START_Y;
         $refreshMain.show();
         
-        if (e.touches[0]) {
-            touchPos.x1 = e.touches[0].pageX;
-            touchStartY = touchPos.y1 = e.touches[0].pageY;
+        // Form chrome & jQuery
+        var _e = ( e.touches != undefined ? e : { touches: e.originalEvent.changedTouches } );
+        if (_e.touches[0]) {
+            touchPos.x1 = _e.touches[0].pageX;
+            touchStartY = touchPos.y1 = _e.touches[0].pageY;
         }
     }
 
     function touchMove(e){
         var thisTouch, distanceY;
         var now = new Date().getTime();
+        
+        // Form chrome & jQuery
+        var _e = ( e.touches != undefined ? e : { touches: e.originalEvent.changedTouches } );
 
-        if (touchPos.top > 0 || isShowLoading || !e.touches || e.touches.length !== 1) {
+        if (touchPos.top > 0 || isShowLoading || !_e.touches || _e.touches.length !== 1) {
             // Just allow one finger
             return;
         }
 
-        thisTouch = e.touches[0];
+        thisTouch = _e.touches[0];
 
         touchPos.x2 = thisTouch.pageX;
         touchPos.y2 = thisTouch.pageY;

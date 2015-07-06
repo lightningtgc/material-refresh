@@ -454,5 +454,5 @@
 
     window.mRefresh = mRefresh;
 
-})(Zepto || jQuery);
+} ( typeof(Zepto) == "undefined" ? jQuery : Zepto ) );
 

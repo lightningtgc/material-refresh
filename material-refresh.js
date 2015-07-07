@@ -45,7 +45,8 @@
 
     var lastTime = new Date().getTime();
 
-    var isIOS = $.os.ios;
+    // For PC debug in chrom & use jQuery.
+    var isIOS = ( $.os == undefined ? false : $.os.ios );
 
     var tmpl = '<div id="muiRefresh" class="mui-refresh-main">\
         <div class="mui-refresh-wrapper ">\

@@ -88,38 +88,47 @@
          * 2. Optimize circle rotate animation
          */
 
-        function parseIntPx(v) {
-          var m = v.match('(\d+)px');
-          if (m == null) return 0;
-          return parseInt(m[1], 10);
+        var $ = function() {
+            var parent, el;
+
+            if (arguments.length === 1) {
+                el = arguments[0];
+                parent = document;
+            } else {
+                parent = arguments[0];
+                el = arguments[1];
+            }
+
+            return el && (typeof el) === 'string' ? parent.querySelector(el)
+                 : el instanceof HTMLElement      ? el
+                                                  : null;
         }
 
         // Main function to init the refresh style
         function mRefresh(options) {
             options = options || {};
 
-            scrollEl = options.scrollEl ? options.scrollEl :
-                            isIOS ? scrollEl : document;
+            scrollEl = $(options.scrollEl || (isIOS ? scrollEl : document));
 
             // extend options
             onBegin = options.onBegin;
             onEnd = options.onEnd;
             maxRotateTime = options.maxTime || maxRotateTime;
-            refreshNav = options.nav || refreshNav;
+            refreshNav = $(options.nav || refreshNav);
 
-            if (document.querySelectorAll('#muirefresh').length === 0) {
+            if (!$('#muirefresh')) {
                 renderTmpl();
             }
 
-            refreshMain = document.querySelector('#muiRefresh');
-            spinnerWrapper = refreshMain.querySelector('.mui-spinner-wrapper');
-            arrowWrapper = refreshMain.querySelector('.mui-arrow-wrapper');
-            arrowMain = refreshMain.querySelector('.mui-arrow-main');
+            refreshMain = $('#muiRefresh');
+            spinnerWrapper = $(refreshMain, '.mui-spinner-wrapper');
+            arrowWrapper = $(refreshMain, '.mui-arrow-wrapper');
+            arrowMain = $(refreshMain, '.mui-arrow-main');
 
             // Custom nav bar
             if (!isDefaultType()) {
                 refreshMain.classList.add('mui-refresh-nav');
-                basePosY = parseIntPx(refreshNav.style.height) + 20;
+                basePosY = refreshNav.clientHeight + 20;
                 var rect;
                 if(rect = refreshNav.getBoundingClientRect()){
                     var top  = rect.top + document.body.scrollTop,
@@ -135,8 +144,8 @@
                 }
 
                 //Set z-index to make sure ablow the nav bar
-                var navIndex = refreshNav.style.zIndex;
-                refreshMain.style.zIndex = navIndex - 1;
+                var navIndex = window.getComputedStyle(refreshNav).zIndex;
+                refreshMain.style.zIndex = Math.max(1, parseInt(navIndex) - 1);
             }
 
             //Set custom z-index
@@ -231,7 +240,7 @@
             if(isIOS && scrollEl == document.body){
                 touchPos.top = window.scrollY;
             }else if(scrollEl != document){
-                touchPos.top = document.querySelector(scrollEl).scrollTop;
+                touchPos.top = scrollEl.scrollTop;
             } else {
                 touchPos.top = (document.documentElement || document.body.parentNode || document.body).scrollTop;
             }
@@ -435,7 +444,7 @@
          * @return {Boolen}
          */
         function isDefaultType() {
-           return !refreshNav.length || document.querySelectorAll(refreshNav).length === 0;
+           return !refreshNav;
         }
 
         function bindEvents() {
